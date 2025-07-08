@@ -21,6 +21,25 @@ h1 {
   font-size: 2.5rem;
 }
 
+.navbar {
+  padding-top: 1rem;
+}
+
+.navbar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+}
+
+.navbar a {
+  color: #fff;
+  font-weight: 500;
+}
+
 .blog-list {
   max-width: 800px;
   margin: auto;
@@ -131,4 +150,8 @@ body.dark-mode article {
 
 body.dark-mode a {
   color: #90caf9;
+}
+
+body.dark-mode .navbar a {
+  color: #f1f1f1;
 }
