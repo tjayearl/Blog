@@ -1,0 +1,236 @@
+/* Global Styles */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+header {
+  text-align: center;
+  padding: 2rem;
+  background: #292c34;
+  color: #fff;
+  position: relative;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.5rem;
+}
+
+.navbar {
+  padding-top: 1rem;
+}
+
+.navbar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+}
+
+.navbar a {
+  color: #fff;
+  font-weight: 500;
+}
+
+.blog-list {
+  max-width: 800px;
+  margin: auto;
+  padding: 2rem;
+}
+
+article {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: box-shadow 0.3s;
+}
+
+article:hover {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+}
+
+a {
+  text-decoration: none;
+  color: #2a7ae2;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  background: #292c34;
+  color: #fff;
+  margin-top: 2rem;
+}
+
+/* Toggle Switch */
+.toggle-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  background-color: #ccc;
+  border-radius: 24px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: 0.4s;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:checked + .slider::before {
+  transform: translateX(26px);
+}
+
+/* DARK MODE STYLES */
+body.dark-mode {
+  background-color: #1e1e1e;
+  color: #f1f1f1;
+}
+
+body.dark-mode header,
+body.dark-mode footer {
+  background-color: #111;
+  color: #f1f1f1;
+}
+
+body.dark-mode article {
+  background: #2c2c2c;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode a {
+  color: #90caf9;
+}
+
+body.dark-mode .navbar a {
+  color: #f1f1f1;
+}
+
+/* News Form Styles */
+.add-news-form {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.add-news-form h2 {
+  margin-top: 0;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box; /* Ensures padding doesn't affect width */
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 1rem;
+  transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+}
+
+.add-news-form button {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #2a7ae2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-news-form button:hover {
+  background-color: #2161b5;
+}
+
+/* Dark Mode Form Styles */
+body.dark-mode .add-news-form {
+  background: #2c2c2c;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .form-group input,
+body.dark-mode .form-group textarea {
+  background-color: #3a3a3a;
+  color: #f1f1f1;
+  border-color: #555;
+}
+
+body.dark-mode .add-news-form button {
+  background-color: #90caf9;
+  color: #111;
+}
+
+body.dark-mode .add-news-form button:hover {
+  background-color: #64b5f6;
+}
