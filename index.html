@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Elegant Blog</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <div id="date-time">October 26, 2023</div>
+                <div class="social-media">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+                <div class="header-actions">
+                    <button class="subscribe-btn">Subscribe</button>
+                    <button id="sign-in-btn" class="signin-btn">Sign In / Register</button>
+                </div>
+            </div>
+        </div>
+        <div class="header-container">
+            <h1 class="logo">My Elegant Blog</h1>
+            <nav>
+                <a href="#" class="nav-link" data-target="home">Home</a>
+                <div class="dropdown">
+                    <a href="#" class="nav-link">Categories <i class="fas fa-caret-down"></i></a>
+                    <div class="dropdown-content">
+                        <a href="#">Breaking News</a>
+                        <a href="#">Local</a>
+                        <a href="#">World</a>
+                        <a href="#">Politics</a>
+                        <a href="#">Business</a>
+                        <a href="#">Tech</a>
+                        <a href="#">Entertainment</a>
+                        <a href="#">Sports</a>
+                        <a href="#">Lifestyle</a>
+                    </div>
+                </div>
+                <a href="#" class="nav-link">Opinions</a>
+                <a href="#" class="nav-link" data-target="about-section">About Us</a>
+                <a href="#" class="nav-link" data-target="contact-section">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="news-ticker-container">
+        <div class="ticker-label">Breaking</div>
+        <div class="ticker-content">
+            <p>This is a scrolling news ticker with the latest updates... Lorem ipsum dolor sit amet, consectetur adipiscing elit... Another breaking story follows...</p>
+        </div>
+    </div>
+
+    <main>
+        <section id="login-section" class="container hidden">
+            <h2>Admin Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button id="login-btn">Login</button>
+        </section>
+
+        <section id="admin-panel" class="container hidden">
+            <h2>Add New Article</h2>
+            <input type="text" id="news-title" placeholder="Article Title">
+            <textarea id="news-content" placeholder="Article Content"></textarea>
+            <button id="add-news">Add News</button>
+        </section>
+
+        <section id="about-section" class="container hidden">
+            <h2>About Us</h2>
+            <p>Welcome to My Elegant Blog, your number one source for all things news. We're dedicated to giving you the very best of information, with a focus on reliability, depth, and perspective.</p>
+            <h3>The Creators</h3>
+            <div class="creators-container">
+                <div class="creator-card">
+                    <h4>Tjay Earl</h4>
+                    <p>Co-founder and chief editor, Tjay brings a decade of journalistic experience to the table, ensuring every story is told with accuracy and passion.</p>
+                </div>
+                <div class="creator-card">
+                    <h4>Ines Kibe</h4>
+                    <p>Co-founder and lead technology writer, Ines has a keen eye for the future and a talent for making complex topics accessible to everyone.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact-section" class="container hidden">
+            <h2>Contact Us</h2>
+            <input type="text" placeholder="Your Name">
+            <input type="text" placeholder="Your Email">
+            <textarea placeholder="Your Message"></textarea>
+            <button>Send Message</button>
+        </section>
+
+        <div id="news-container"></div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
