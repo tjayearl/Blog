@@ -5,6 +5,7 @@ const ADMIN_ACCOUNTS = [
 ];
 let isAdminLoggedIn = false;
 let articles = []; // This will hold all our blog posts
+let selectedPlan = 'monthly'; // Default selected plan
 
 // --- DOM ELEMENTS ---
 // Sections
@@ -30,6 +31,7 @@ const passwordInput = document.getElementById('password');
 // Modal Elements
 const modalOverlay = document.getElementById('modal-overlay');
 const modalCloseBtn = document.getElementById('modal-close-btn');
+const paymentPlansContainer = document.querySelector('.payment-plans');
 const declineSubscribeBtn = document.getElementById('decline-subscribe-btn');
 const confirmSubscribeBtn = document.getElementById('confirm-subscribe-btn');
 
@@ -220,10 +222,23 @@ modalOverlay.addEventListener('click', (e) => {
     }
 });
 
+paymentPlansContainer.addEventListener('click', (e) => {
+    const clickedPlan = e.target.closest('.plan-card');
+    if (!clickedPlan) return;
+
+    // Update state
+    selectedPlan = clickedPlan.dataset.plan;
+
+    // Update UI
+    const allPlanCards = paymentPlansContainer.querySelectorAll('.plan-card');
+    allPlanCards.forEach(card => card.classList.remove('selected'));
+    clickedPlan.classList.add('selected');
+});
+
 confirmSubscribeBtn.addEventListener('click', () => {
     const emailInput = document.getElementById('subscribe-email');
     if (emailInput.value && emailInput.checkValidity()) {
-        alert(`Thank you for subscribing with ${emailInput.value}!`);
+        alert(`Thank you for subscribing to the ${selectedPlan} plan with ${emailInput.value}!`);
         modalOverlay.classList.add('hidden');
         emailInput.value = '';
     } else {
@@ -243,6 +258,8 @@ function init() {
         title: "Local Park Gets a Facelift",
         content: "The community-led initiative to renovate the downtown park is now complete..."
     }, ];
+    // Set default selected plan on init
+    paymentPlansContainer.querySelector(`.plan-card[data-plan='${selectedPlan}']`).classList.add('selected');
     showPage('home'); // Show the home page by default
 }
 

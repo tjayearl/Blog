@@ -396,3 +396,67 @@ button:hover {
 .decline-btn:hover {
     background-color: #4b5263;
 }
+
+/* --- Payment Plan Styles --- */
+.payment-plans {
+    display: flex;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.plan-card {
+    flex: 1;
+    padding: 1rem;
+    border: 2px solid #4b5263;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s ease, transform 0.2s ease;
+    position: relative;
+}
+
+.plan-card:hover {
+    transform: translateY(-3px);
+    border-color: #61afef;
+}
+
+.plan-card.selected {
+    border-color: #98c379;
+    background-color: #2c313a;
+}
+
+.plan-card h4 {
+    margin: 0 0 0.5rem 0;
+    color: #ffffff;
+}
+
+.plan-card .price {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #98c379;
+    margin: 0;
+}
+
+.plan-card .price span {
+    font-size: 1rem;
+    font-weight: normal;
+    color: #abb2bf;
+}
+
+.plan-card .desc {
+    font-size: 0.9rem;
+    margin: 0.5rem 0 0 0;
+}
+
+.best-value {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #e06c75;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
