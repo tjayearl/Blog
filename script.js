@@ -121,10 +121,13 @@ function displayArticles() {
          </div>` :
         "";
 
+      const categoryHTML = article.category ? `<div class="article-meta">Category: ${escapeHTML(article.category)}</div>` : '';
+
       articleEl.innerHTML = `
         ${adminButtonsHTML}
+        ${categoryHTML}
         <h2>${escapeHTML(article.title)}</h2>
-        <p>${escapeHTML(article.content)}</p>
+        <p>${escapeHTML(article.content).replace(/\n/g, '<br>')}</p>
       `;
     }
     newsContainer.appendChild(articleEl);
@@ -149,10 +152,12 @@ function loadArticlesFromStorage() {
         // Add some dummy articles if storage is empty
         articles = [{
             title: "Tech Advances in 2024",
-            content: "This year has seen incredible leaps in AI and quantum computing..."
+            content: "This year has seen incredible leaps in AI and quantum computing...",
+            category: "Tech"
         }, {
             title: "Local Park Gets a Facelift",
-            content: "The community-led initiative to renovate the downtown park is now complete..."
+            content: "The community-led initiative to renovate the downtown park is now complete...",
+            category: "Local"
         }, ];
     }
 }
@@ -176,19 +181,22 @@ function deleteArticle(index) {
 function addArticle() {
     const titleInput = document.getElementById("news-title");
     const contentInput = document.getElementById("news-content");
+    const categoryInput = document.getElementById("news-category");
 
-    if (titleInput.value && contentInput.value) {
+    if (titleInput.value && contentInput.value && categoryInput.value) {
         articles.unshift({
             title: titleInput.value,
-            content: contentInput.value
+            content: contentInput.value,
+            category: categoryInput.value
         });
         saveArticlesToStorage();
         displayArticles();
         titleInput.value = "";
         contentInput.value = "";
+        categoryInput.value = "";
         showNotification("Article added successfully!");
     } else {
-        showNotification("Please fill in both title and content.", "error");
+        showNotification("Please fill in title, content, and category.", "error");
     }
 }
 
@@ -217,9 +225,10 @@ function saveArticle(index) {
     const articleEl = document.querySelector(`article[data-index='${index}']`);
     const newTitle = articleEl.querySelector('.edit-title').value;
     const newContent = articleEl.querySelector('.edit-content').value;
+    const newCategory = articleEl.querySelector('.edit-category').value;
 
     if (newTitle && newContent) {
-        articles[index] = { title: newTitle, content: newContent };
+        articles[index] = { title: newTitle, content: newContent, category: newCategory };
         saveArticlesToStorage();
         exitEditMode(); // This will save and re-render the articles list
         showNotification("Article updated successfully!");
@@ -296,6 +305,16 @@ function escapeHTML(str) {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 // --- EVENT LISTENERS ---
+
+categoriesDropdown.addEventListener('click', (e) => {
+    e.preventDefault();
+    const link = e.target.closest('.category-link');
+    if (!link) return;
+
+    currentCategoryFilter = link.dataset.category;
+    // Ensure the main news feed is visible to show the filtered articles
+    showPage('home');
+});
 
 signInBtn.addEventListener('click', (e) => {
     e.stopPropagation(); // Prevents the document click listener from firing immediately

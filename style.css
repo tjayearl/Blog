@@ -354,6 +354,15 @@ button:hover {
   overflow: hidden; /* Clear the float from the action buttons */
 }
 
+.article-meta {
+  font-size: 0.9rem;
+  color: #56b6c2; /* Teal to match edit button */
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
 .article-actions {
     float: right;
     display: flex;
