@@ -228,6 +228,25 @@ h2 {
   margin-top: 0;
 }
 
+#admin-panel h3 {
+    color: #98c379; /* Green to match article titles */
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #4b5263;
+}
+
+#admin-panel h3:first-of-type {
+    margin-top: 0;
+}
+
+.admin-divider {
+    border: 0;
+    height: 1px;
+    background-color: #4b5263;
+    margin: 2rem 0;
+}
+
 /* Utility class to hide elements */
 .hidden {
   display: none;
@@ -305,6 +324,14 @@ button:hover {
 
 .edit-btn:hover {
     background-color: #489ca7;
+}
+
+.update-ticker-btn {
+    background-color: #e5c07b; /* A nice gold/yellow */
+}
+
+.update-ticker-btn:hover {
+    background-color: #d1af68;
 }
 
 /* Styles for the inline article edit form */

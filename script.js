@@ -7,6 +7,7 @@ let isAdminLoggedIn = false;
 let articles = []; // This will hold all our blog posts
 let currentlyEditingIndex = null; // To track which article is being edited
 let selectedPlan = 'monthly'; // Default selected plan
+let tickerText = 'This is a scrolling news ticker with the latest updates... Lorem ipsum dolor sit amet, consectetur adipiscing elit... Another breaking story follows...';
 let currentCategoryFilter = 'all'; // To track the current category filter
 
 // --- DOM ELEMENTS ---
@@ -21,6 +22,7 @@ const mainContentSections = [adminPanel, newsContainer, aboutSection, contactFor
 // Buttons & Links
 const loginBtn = document.getElementById("login-btn");
 const addNewsBtn = document.getElementById("add-news");
+const updateTickerBtn = document.getElementById('update-ticker-btn');
 const subscribeBtn = document.querySelector('.subscribe-btn');
 const signInBtn = document.getElementById('sign-in-btn');
 const categoriesDropdown = document.getElementById('categories-dropdown');
@@ -31,6 +33,7 @@ const dateTimeEl = document.getElementById('date-time');
 const loginPanel = document.getElementById('login-panel');
 const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
+const tickerContent = document.getElementById('ticker-text');
 
 // Modal Elements
 const modalOverlay = document.getElementById('modal-overlay');
@@ -78,6 +81,51 @@ function updateDateTime() {
         day: 'numeric'
     };
     dateTimeEl.textContent = now.toLocaleDateString('en-US', options);
+}
+
+/**
+ * Updates the news ticker text in the DOM.
+ */
+function updateTickerDOM() {
+    if (tickerContent) {
+        // By cloning and replacing the node, we restart the CSS animation
+        const newTickerContent = tickerContent.cloneNode(true);
+        newTickerContent.textContent = tickerText;
+        tickerContent.parentNode.replaceChild(newTickerContent, tickerContent);
+    }
+}
+
+/**
+ * Saves the news ticker text to localStorage.
+ */
+function saveTickerToStorage() {
+    localStorage.setItem('blogTickerText', tickerText);
+}
+
+/**
+ * Loads the news ticker text from localStorage.
+ */
+function loadTickerFromStorage() {
+    const storedTicker = localStorage.getItem('blogTickerText');
+    if (storedTicker) {
+        tickerText = storedTicker;
+    }
+}
+
+/**
+ * Handles the click event to update the news ticker.
+ */
+function handleUpdateTicker() {
+    const tickerTextInput = document.getElementById('ticker-text-input');
+    const newText = tickerTextInput.value.trim();
+    if (newText) {
+        tickerText = newText;
+        saveTickerToStorage();
+        updateTickerDOM();
+        showNotification('News ticker updated successfully!');
+    } else {
+        showNotification('Ticker text cannot be empty.', 'error');
+    }
 }
 
 /**
@@ -146,6 +194,7 @@ function saveArticlesToStorage() {
  */
 function loadArticlesFromStorage() {
     const storedArticles = localStorage.getItem('blogArticles');
+
     if (storedArticles) {
         articles = JSON.parse(storedArticles);
     } else {
@@ -249,6 +298,11 @@ function updateAdminUI() {
         } else {
             adminPanel.classList.add('hidden');
         }
+        // Populate ticker input with current text
+        const tickerTextInput = document.getElementById('ticker-text-input');
+        if (tickerTextInput) {
+            tickerTextInput.value = tickerText;
+        }
     } else {
         signInBtn.textContent = 'Sign In / Register';
         exitEditMode(); // Ensure we exit edit mode on logout
@@ -327,6 +381,7 @@ signInBtn.addEventListener('click', (e) => {
 
 loginBtn.addEventListener('click', handleLogin);
 addNewsBtn.addEventListener('click', addArticle);
+updateTickerBtn.addEventListener('click', handleUpdateTicker);
 
 navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
@@ -419,9 +474,11 @@ contactForm.addEventListener('submit', (e) => {
 function init() {
     updateDateTime();
     loadArticlesFromStorage();
+    loadTickerFromStorage();
     // Set default selected plan on init
     paymentPlansContainer.querySelector(`.plan-card[data-plan='${selectedPlan}']`).classList.add('selected');
     showPage('home'); // Show the home page by default
+    updateTickerDOM();
 }
 
 init();
