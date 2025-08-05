@@ -17,7 +17,8 @@ const newsContainer = document.getElementById("news-container");
 const notificationContainer = document.getElementById('notification-container');
 const aboutSection = document.getElementById("about-section");
 const contactForm = document.getElementById('contact-section');
-const mainContentSections = [adminPanel, newsContainer, aboutSection, contactForm];
+const opinionsSection = document.getElementById('opinions-section');
+const mainContentSections = [adminPanel, newsContainer, aboutSection, contactForm, opinionsSection];
 
 // Buttons & Links
 const loginBtn = document.getElementById("login-btn");
@@ -26,6 +27,7 @@ const updateTickerBtn = document.getElementById('update-ticker-btn');
 const subscribeBtn = document.querySelector('.subscribe-btn');
 const signInBtn = document.getElementById('sign-in-btn');
 const categoriesDropdown = document.getElementById('categories-dropdown');
+const submitOpinionBtn = document.getElementById('submit-opinion-btn');
 const navLinks = document.querySelectorAll('nav .nav-link[data-target]');
 
 // Header Elements
@@ -353,6 +355,55 @@ function showNotification(message, type = 'success') {
     setTimeout(() => {
         notification.remove();
     }, 4000);
+}
+
+/**
+ * Resets the opinion section to its initial state.
+ */
+function resetOpinionsSection() {
+    const websiteRatingStars = document.getElementById('website-rating-stars');
+    const deliveryRatingStars = document.getElementById('delivery-rating-stars');
+
+    if (websiteRatingStars) websiteRatingStars.dataset.rating = 0;
+    if (deliveryRatingStars) deliveryRatingStars.dataset.rating = 0;
+
+    document.getElementById('opinion-comments').value = '';
+    document.querySelectorAll('.stars i').forEach(star => {
+        star.classList.remove('fas');
+        star.classList.add('far');
+    });
+}
+
+/**
+ * Handles the hover effect over the rating stars.
+ * @param {MouseEvent} e - The mouse event.
+ */
+function handleStarHover(e) {
+    if (!e.target.matches('.fa-star')) return;
+    const stars = Array.from(e.currentTarget.children);
+    const hoverIndex = stars.indexOf(e.target);
+    stars.forEach((star, index) => {
+        star.classList.toggle('fas', index <= hoverIndex);
+        star.classList.toggle('far', index > hoverIndex);
+    });
+}
+
+/**
+ * Handles when the mouse leaves the star container.
+ * @param {MouseEvent} e - The mouse event.
+ */
+function handleStarMouseOut(e) {
+    const stars = Array.from(e.currentTarget.children);
+    const currentRating = parseInt(e.currentTarget.dataset.rating || '0', 10);
+    stars.forEach((star, index) => {
+        star.classList.toggle('fas', index < currentRating);
+        star.classList.toggle('far', index >= currentRating);
+    });
+}
+
+/**
+ * Handles clicking on a star to set the rating.
+ * @param {MouseEvent} e - The mouse event.
 }
 
 function escapeHTML(str) {
