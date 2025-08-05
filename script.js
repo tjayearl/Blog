@@ -1,6 +1,8 @@
 // --- STATE ---
-const ADMIN_USER = "Tjay Earl";
-const ADMIN_PASS = "1884";
+const ADMIN_ACCOUNTS = [
+    { user: "Tjay Earl", pass: "1884" },
+    { user: "Ines Kibe", pass: "1454" }
+];
 let isAdminLoggedIn = false;
 let articles = []; // This will hold all our blog posts
 
@@ -15,6 +17,7 @@ const mainPages = [newsContainer, aboutSection, contactSection];
 // Buttons & Links
 const loginBtn = document.getElementById("login-btn");
 const addNewsBtn = document.getElementById("add-news");
+const subscribeBtn = document.querySelector('.subscribe-btn');
 const signInBtn = document.getElementById('sign-in-btn');
 const navLinks = document.querySelectorAll('nav .nav-link[data-target]');
 
@@ -23,6 +26,12 @@ const dateTimeEl = document.getElementById('date-time');
 const loginPanel = document.getElementById('login-panel');
 const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
+
+// Modal Elements
+const modalOverlay = document.getElementById('modal-overlay');
+const modalCloseBtn = document.getElementById('modal-close-btn');
+const declineSubscribeBtn = document.getElementById('decline-subscribe-btn');
+const confirmSubscribeBtn = document.getElementById('confirm-subscribe-btn');
 
 // --- FUNCTIONS ---
 
@@ -141,7 +150,11 @@ function updateAdminUI() {
  * Handles the admin login process.
  */
 function handleLogin() {
-    if (usernameInput.value === ADMIN_USER && passwordInput.value === ADMIN_PASS) {
+    const user = usernameInput.value;
+    const pass = passwordInput.value;
+    const isAdmin = ADMIN_ACCOUNTS.some(account => account.user === user && account.pass === pass);
+
+    if (isAdmin) {
         isAdminLoggedIn = true;
         loginPanel.classList.add('hidden');
         usernameInput.value = '';
@@ -185,6 +198,36 @@ navLinks.forEach(link => {
 document.addEventListener('click', (e) => {
     if (!loginPanel.contains(e.target) && e.target !== signInBtn) {
         loginPanel.classList.add('hidden');
+    }
+});
+
+subscribeBtn.addEventListener('click', () => {
+    modalOverlay.classList.remove('hidden');
+});
+
+modalCloseBtn.addEventListener('click', () => {
+    modalOverlay.classList.add('hidden');
+});
+
+declineSubscribeBtn.addEventListener('click', () => {
+    modalOverlay.classList.add('hidden');
+});
+
+// Close modal if clicking on the overlay itself
+modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+        modalOverlay.classList.add('hidden');
+    }
+});
+
+confirmSubscribeBtn.addEventListener('click', () => {
+    const emailInput = document.getElementById('subscribe-email');
+    if (emailInput.value && emailInput.checkValidity()) {
+        alert(`Thank you for subscribing with ${emailInput.value}!`);
+        modalOverlay.classList.add('hidden');
+        emailInput.value = '';
+    } else {
+        alert('Please enter a valid email address.');
     }
 });
 
