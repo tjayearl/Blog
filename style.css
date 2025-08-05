@@ -236,6 +236,7 @@ h2 {
 /* Form elements styling */
 input[type="text"],
 input[type="password"],
+select,
 textarea {
   width: calc(100% - 22px); /* 100% minus padding and border */
   padding: 10px;
@@ -245,6 +246,10 @@ textarea {
   background-color: #282c34;
   color: #abb2bf;
   font-size: 1rem;
+}
+
+select {
+    width: 100%; /* Override the calc for select */
 }
 
 textarea {

@@ -7,6 +7,7 @@ let isAdminLoggedIn = false;
 let articles = []; // This will hold all our blog posts
 let currentlyEditingIndex = null; // To track which article is being edited
 let selectedPlan = 'monthly'; // Default selected plan
+let currentCategoryFilter = 'all'; // To track the current category filter
 
 // --- DOM ELEMENTS ---
 // Sections
@@ -14,14 +15,15 @@ const adminPanel = document.getElementById("admin-panel");
 const newsContainer = document.getElementById("news-container");
 const notificationContainer = document.getElementById('notification-container');
 const aboutSection = document.getElementById("about-section");
-const contactSection = document.getElementById("contact-section");
-const mainPages = [newsContainer, aboutSection, contactSection];
+const contactForm = document.getElementById('contact-section');
+const mainContentSections = [adminPanel, newsContainer, aboutSection, contactForm];
 
 // Buttons & Links
 const loginBtn = document.getElementById("login-btn");
 const addNewsBtn = document.getElementById("add-news");
 const subscribeBtn = document.querySelector('.subscribe-btn');
 const signInBtn = document.getElementById('sign-in-btn');
+const categoriesDropdown = document.getElementById('categories-dropdown');
 const navLinks = document.querySelectorAll('nav .nav-link[data-target]');
 
 // Header Elements
@@ -35,16 +37,15 @@ const modalOverlay = document.getElementById('modal-overlay');
 const modalCloseBtn = document.getElementById('modal-close-btn');
 const paymentPlansContainer = document.querySelector('.payment-plans');
 const declineSubscribeBtn = document.getElementById('decline-subscribe-btn');
-const contactForm = document.querySelector('#contact-section');
 const confirmSubscribeBtn = document.getElementById('confirm-subscribe-btn');
 
 // --- FUNCTIONS ---
 
 /**
- * Hides all main pages.
+ * Hides all main content sections.
  */
-function hideAllPages() {
-    mainPages.forEach(page => page.classList.add('hidden'));
+function hideAllMainContent() {
+    mainContentSections.forEach(section => section.classList.add('hidden'));
 }
 
 /**
@@ -52,7 +53,7 @@ function hideAllPages() {
  * @param {string} target - The ID of the section to show, or 'home'.
  */
 function showPage(target) {
-    hideAllPages();
+    hideAllMainContent();
 
     if (target === 'home') {
         newsContainer.classList.remove('hidden');
@@ -83,16 +84,27 @@ function updateDateTime() {
  * Renders the list of articles to the DOM.
  */
 function displayArticles() {
-  newsContainer.innerHTML = "";
-  articles.forEach((article, index) => {
-    const articleEl = document.createElement("article");
-    articleEl.dataset.index = index;
+    newsContainer.innerHTML = "";
+    const filteredArticles = articles.filter(article =>
+        currentCategoryFilter === 'all' || article.category === currentCategoryFilter
+    );
 
-    if (currentlyEditingIndex === index) {
+  filteredArticles.forEach((article) => {
+    const originalIndex = articles.indexOf(article);
+    const articleEl = document.createElement("article");
+    articleEl.dataset.index = originalIndex;
+
+    if (currentlyEditingIndex === originalIndex) {
       // Render the article in EDIT mode
+      const categories = ["Breaking News", "Local", "World", "Politics", "Business", "Tech", "Entertainment", "Sports", "Lifestyle"];
+      const categoryOptions = categories.map(cat =>
+        `<option value="${escapeHTML(cat)}" ${article.category === cat ? 'selected' : ''}>${escapeHTML(cat)}</option>`
+      ).join('');
+
       articleEl.innerHTML = `
         <div class="edit-form">
             <input type="text" class="edit-title" value="${escapeHTML(article.title)}">
+            <select class="edit-category">${categoryOptions}</select>
             <textarea class="edit-content">${escapeHTML(article.content)}</textarea>
             <div class="edit-form-actions">
                 <button class="save-btn">Save Changes</button>

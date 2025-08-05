@@ -39,16 +39,17 @@
                 <a href="#" class="nav-link" data-target="home">Home</a>
                 <div class="dropdown">
                     <a href="#" class="nav-link">Categories <i class="fas fa-caret-down"></i></a>
-                    <div class="dropdown-content">
-                        <a href="#">Breaking News</a>
-                        <a href="#">Local</a>
-                        <a href="#">World</a>
-                        <a href="#">Politics</a>
-                        <a href="#">Business</a>
-                        <a href="#">Tech</a>
-                        <a href="#">Entertainment</a>
-                        <a href="#">Sports</a>
-                        <a href="#">Lifestyle</a>
+                    <div class="dropdown-content" id="categories-dropdown">
+                        <a href="#" class="category-link" data-category="all">All Categories</a>
+                        <a href="#" class="category-link" data-category="Breaking News">Breaking News</a>
+                        <a href="#" class="category-link" data-category="Local">Local</a>
+                        <a href="#" class="category-link" data-category="World">World</a>
+                        <a href="#" class="category-link" data-category="Politics">Politics</a>
+                        <a href="#" class="category-link" data-category="Business">Business</a>
+                        <a href="#" class="category-link" data-category="Tech">Tech</a>
+                        <a href="#" class="category-link" data-category="Entertainment">Entertainment</a>
+                        <a href="#" class="category-link" data-category="Sports">Sports</a>
+                        <a href="#" class="category-link" data-category="Lifestyle">Lifestyle</a>
                     </div>
                 </div>
                 <a href="#" class="nav-link">Opinions</a>
@@ -71,13 +72,25 @@
         <section id="admin-panel" class="container hidden">
             <h2>Add New Article</h2>
             <input type="text" id="news-title" placeholder="Article Title">
+            <select id="news-category" name="category">
+                <option value="" disabled selected>Select a Category</option>
+                <option value="Breaking News">Breaking News</option>
+                <option value="Local">Local</option>
+                <option value="World">World</option>
+                <option value="Politics">Politics</option>
+                <option value="Business">Business</option>
+                <option value="Tech">Tech</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Sports">Sports</option>
+                <option value="Lifestyle">Lifestyle</option>
+            </select>
             <textarea id="news-content" placeholder="Article Content"></textarea>
             <button id="add-news">Add News</button>
         </section>
 
         <section id="about-section" class="container hidden">
             <h2>About Us</h2>
-            <p>Welcome to My Elegant Blog, your number one source for all things news. We're dedicated to giving you the very best of information, with a focus on reliability, depth, and perspective.</p>
+            <p>Welcome to ClearView News, your number one source for all things news. We're dedicated to giving you the very best of information, with a focus on reliability, depth, and perspective.</p>
             <h3>The Creators</h3>
             <div class="creators-container">
                 <div class="creator-card">
