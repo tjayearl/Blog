@@ -1,7 +1,7 @@
 // --- STATE ---
 const ADMIN_ACCOUNTS = [
     { user: "Tjay Earl", pass: "1884" },
-    { user: "Ines Kibe", pass: "Kibe 1454" }
+    { user: "Ines Kibe", pass: "1454" }
 ];
 let isAdminLoggedIn = false;
 let articles = []; // This will hold all our blog posts
