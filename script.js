@@ -1,16 +1,18 @@
 // --- STATE ---
 const ADMIN_ACCOUNTS = [
     { user: "Tjay Earl", pass: "1884" },
-    { user: "Ines Kibe", pass: "1454" }
+    { user: "Ines Kibe", pass: "Kibe 1454" }
 ];
 let isAdminLoggedIn = false;
 let articles = []; // This will hold all our blog posts
+let currentlyEditingIndex = null; // To track which article is being edited
 let selectedPlan = 'monthly'; // Default selected plan
 
 // --- DOM ELEMENTS ---
 // Sections
 const adminPanel = document.getElementById("admin-panel");
 const newsContainer = document.getElementById("news-container");
+const notificationContainer = document.getElementById('notification-container');
 const aboutSection = document.getElementById("about-section");
 const contactSection = document.getElementById("contact-section");
 const mainPages = [newsContainer, aboutSection, contactSection];
@@ -33,6 +35,7 @@ const modalOverlay = document.getElementById('modal-overlay');
 const modalCloseBtn = document.getElementById('modal-close-btn');
 const paymentPlansContainer = document.querySelector('.payment-plans');
 const declineSubscribeBtn = document.getElementById('decline-subscribe-btn');
+const contactForm = document.querySelector('#contact-section');
 const confirmSubscribeBtn = document.getElementById('confirm-subscribe-btn');
 
 // --- FUNCTIONS ---
@@ -80,22 +83,66 @@ function updateDateTime() {
  * Renders the list of articles to the DOM.
  */
 function displayArticles() {
-    newsContainer.innerHTML = "";
-    articles.forEach((article, index) => {
-        const articleEl = document.createElement("article");
+  newsContainer.innerHTML = "";
+  articles.forEach((article, index) => {
+    const articleEl = document.createElement("article");
+    articleEl.dataset.index = index;
 
-        // Conditionally add the delete button only if the admin is logged in
-        const deleteButtonHTML = isAdminLoggedIn ?
-            `<button class="delete-btn" onclick="deleteArticle(${index})">Delete</button>` :
-            "";
+    if (currentlyEditingIndex === index) {
+      // Render the article in EDIT mode
+      articleEl.innerHTML = `
+        <div class="edit-form">
+            <input type="text" class="edit-title" value="${escapeHTML(article.title)}">
+            <textarea class="edit-content">${escapeHTML(article.content)}</textarea>
+            <div class="edit-form-actions">
+                <button class="save-btn">Save Changes</button>
+                <button class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+      `;
+    } else {
+      // Render the article in DISPLAY mode
+      const adminButtonsHTML = isAdminLoggedIn ?
+        `<div class="article-actions">
+            <button class="edit-btn">Edit</button>
+            <button class="delete-btn">Delete</button>
+         </div>` :
+        "";
 
-        articleEl.innerHTML = `
-      ${deleteButtonHTML}
-      <h2>${article.title}</h2>
-      <p>${article.content}</p>
-    `;
-        newsContainer.appendChild(articleEl);
-    });
+      articleEl.innerHTML = `
+        ${adminButtonsHTML}
+        <h2>${escapeHTML(article.title)}</h2>
+        <p>${escapeHTML(article.content)}</p>
+      `;
+    }
+    newsContainer.appendChild(articleEl);
+  });
+}
+
+/**
+ * Saves articles to localStorage.
+ */
+function saveArticlesToStorage() {
+    localStorage.setItem('blogArticles', JSON.stringify(articles));
+}
+
+/**
+ * Loads articles from localStorage.
+ */
+function loadArticlesFromStorage() {
+    const storedArticles = localStorage.getItem('blogArticles');
+    if (storedArticles) {
+        articles = JSON.parse(storedArticles);
+    } else {
+        // Add some dummy articles if storage is empty
+        articles = [{
+            title: "Tech Advances in 2024",
+            content: "This year has seen incredible leaps in AI and quantum computing..."
+        }, {
+            title: "Local Park Gets a Facelift",
+            content: "The community-led initiative to renovate the downtown park is now complete..."
+        }, ];
+    }
 }
 
 /**
@@ -104,8 +151,11 @@ function displayArticles() {
  */
 function deleteArticle(index) {
     if (!isAdminLoggedIn) return; // Extra security check
-    articles.splice(index, 1);
-    displayArticles();
+    if (confirm('Are you sure you want to delete this article?')) {
+        articles.splice(index, 1);
+        saveArticlesToStorage();
+        displayArticles();
+    }
 }
 
 /**
@@ -120,11 +170,49 @@ function addArticle() {
             title: titleInput.value,
             content: contentInput.value
         });
+        saveArticlesToStorage();
         displayArticles();
         titleInput.value = "";
         contentInput.value = "";
+        showNotification("Article added successfully!");
     } else {
-        alert("Please fill in both title and content.");
+        showNotification("Please fill in both title and content.", "error");
+    }
+}
+
+/**
+ * Puts a specific article into edit mode.
+ * @param {number} index - The index of the article to edit.
+ */
+function enterEditMode(index) {
+    currentlyEditingIndex = index;
+    displayArticles();
+}
+
+/**
+ * Exits edit mode and reverts any unsaved changes.
+ */
+function exitEditMode() {
+    currentlyEditingIndex = null;
+    displayArticles();
+}
+
+/**
+ * Saves the updated content of an article.
+ * @param {number} index - The index of the article to save.
+ */
+function saveArticle(index) {
+    const articleEl = document.querySelector(`article[data-index='${index}']`);
+    const newTitle = articleEl.querySelector('.edit-title').value;
+    const newContent = articleEl.querySelector('.edit-content').value;
+
+    if (newTitle && newContent) {
+        articles[index] = { title: newTitle, content: newContent };
+        saveArticlesToStorage();
+        exitEditMode(); // This will save and re-render the articles list
+        showNotification("Article updated successfully!");
+    } else {
+        showNotification('Title and content cannot be empty.', 'error');
     }
 }
 
@@ -142,6 +230,7 @@ function updateAdminUI() {
         }
     } else {
         signInBtn.textContent = 'Sign In / Register';
+        exitEditMode(); // Ensure we exit edit mode on logout
         adminPanel.classList.add('hidden');
     }
     // Re-render articles to show/hide delete buttons
@@ -162,8 +251,9 @@ function handleLogin() {
         usernameInput.value = '';
         passwordInput.value = '';
         updateAdminUI();
+        showNotification(`Welcome, ${user}!`);
     } else {
-        alert('Invalid credentials. Please try again.');
+        showNotification('Invalid credentials. Please try again.', 'error');
     }
 }
 
@@ -175,6 +265,24 @@ function handleLogout() {
     updateAdminUI();
 }
 
+/**
+ * Displays a temporary notification message.
+ * @param {string} message - The message to display.
+ * @param {string} type - 'success' (default) or 'error'.
+ */
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type === 'error' ? 'error' : ''}`;
+    notification.textContent = message;
+    notificationContainer.appendChild(notification);
+    setTimeout(() => {
+        notification.remove();
+    }, 4000);
+}
+
+function escapeHTML(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
 // --- EVENT LISTENERS ---
 
 signInBtn.addEventListener('click', (e) => {
@@ -196,6 +304,21 @@ navLinks.forEach(link => {
     });
 });
 
+newsContainer.addEventListener('click', (e) => {
+    const articleEl = e.target.closest('article');
+    if (!articleEl) return;
+    const index = parseInt(articleEl.dataset.index, 10);
+
+    if (e.target.matches('.delete-btn')) {
+        deleteArticle(index);
+    } else if (e.target.matches('.edit-btn')) {
+        enterEditMode(index);
+    } else if (e.target.matches('.save-btn')) {
+        saveArticle(index);
+    } else if (e.target.matches('.cancel-btn')) {
+        exitEditMode();
+    }
+});
 // Close login panel if clicking anywhere else on the page
 document.addEventListener('click', (e) => {
     if (!loginPanel.contains(e.target) && e.target !== signInBtn) {
@@ -238,11 +361,25 @@ paymentPlansContainer.addEventListener('click', (e) => {
 confirmSubscribeBtn.addEventListener('click', () => {
     const emailInput = document.getElementById('subscribe-email');
     if (emailInput.value && emailInput.checkValidity()) {
-        alert(`Thank you for subscribing to the ${selectedPlan} plan with ${emailInput.value}!`);
+        showNotification(`Thank you for subscribing with ${emailInput.value}!`);
         modalOverlay.classList.add('hidden');
         emailInput.value = '';
     } else {
-        alert('Please enter a valid email address.');
+        showNotification('Please enter a valid email address.', 'error');
+    }
+});
+
+contactForm.addEventListener('submit', (e) => {
+    e.preventDefault(); // Prevent actual form submission
+    const nameInput = document.getElementById('contact-name');
+    const emailInput = document.getElementById('contact-email');
+    const messageInput = document.getElementById('contact-message');
+
+    if (nameInput.value && emailInput.value && emailInput.checkValidity() && messageInput.value) {
+        showNotification("Thank you for your message! We'll be in touch.");
+        contactForm.reset();
+    } else {
+        showNotification("Please fill out all fields with a valid email.", "error");
     }
 });
 
@@ -250,14 +387,7 @@ confirmSubscribeBtn.addEventListener('click', () => {
 
 function init() {
     updateDateTime();
-    // Add some dummy articles for demonstration
-    articles = [{
-        title: "Tech Advances in 2024",
-        content: "This year has seen incredible leaps in AI and quantum computing..."
-    }, {
-        title: "Local Park Gets a Facelift",
-        content: "The community-led initiative to renovate the downtown park is now complete..."
-    }, ];
+    loadArticlesFromStorage();
     // Set default selected plan on init
     paymentPlansContainer.querySelector(`.plan-card[data-plan='${selectedPlan}']`).classList.add('selected');
     showPage('home'); // Show the home page by default

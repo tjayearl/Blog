@@ -66,6 +66,8 @@
     </div>
 
     <main>
+        <div id="notification-container"></div>
+
         <section id="admin-panel" class="container hidden">
             <h2>Add New Article</h2>
             <input type="text" id="news-title" placeholder="Article Title">
@@ -89,13 +91,13 @@
             </div>
         </section>
 
-        <section id="contact-section" class="container hidden">
+        <form id="contact-section" class="container hidden">
             <h2>Contact Us</h2>
-            <input type="text" placeholder="Your Name">
-            <input type="text" placeholder="Your Email">
-            <textarea placeholder="Your Message"></textarea>
-            <button>Send Message</button>
-        </section>
+            <input type="text" id="contact-name" placeholder="Your Name">
+            <input type="email" id="contact-email" placeholder="Your Email">
+            <textarea id="contact-message" placeholder="Your Message"></textarea>
+            <button type="submit">Send Message</button>
+        </form>
 
         <div id="news-container"></div>
     </main>

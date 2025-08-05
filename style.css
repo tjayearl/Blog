@@ -151,6 +151,23 @@ main {
   box-sizing: border-box;
 }
 
+/* Notification Styles */
+#notification-container {
+    position: fixed;
+    top: 90px;
+    right: 2rem;
+    z-index: 2000;
+}
+.notification {
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    color: white;
+    background-color: #61afef;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    opacity: 0;
+    animation: fadeInOut 4s ease-in-out;
+}
 /* News Ticker */
 @keyframes ticker {
   0% { transform: translateX(100%); }
@@ -184,6 +201,14 @@ main {
   padding-left: 1.5rem;
   color: #abb2bf;
 }
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0; transform: translateY(-20px); }
+    10%, 90% { opacity: 1; transform: translateY(0); }
+}
+.notification.error {
+    background-color: #e06c75;
+}
+
 
 /* Container for sections */
 .container {
@@ -258,13 +283,59 @@ button:hover {
 .signin-btn:hover { background-color: #61afef; }
 
 .delete-btn {
-  background-color: #e06c75; /* Soft red for delete */
-  width: auto; /* Override full-width for delete button */
-  float: right;
+    background-color: #e06c75; /* Soft red for delete */
+}
+
+.delete-btn, .edit-btn {
+    width: auto; /* Override full-width for these buttons */
 }
 
 .delete-btn:hover {
   background-color: #c95a63; /* Darker red on hover */
+}
+
+.edit-btn {
+    background-color: #56b6c2; /* A nice teal/cyan */
+}
+
+.edit-btn:hover {
+    background-color: #489ca7;
+}
+
+/* Styles for the inline article edit form */
+.edit-form .edit-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #98c379;
+    background-color: #21252b;
+}
+
+.edit-form .edit-content {
+    min-height: 150px;
+}
+
+.edit-form-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.edit-form-actions button {
+    width: auto;
+}
+
+.save-btn {
+    background-color: #98c379;
+}
+.save-btn:hover {
+    background-color: #84ac65;
+}
+.cancel-btn {
+    background-color: #abb2bf;
+    color: #282c34;
+}
+.cancel-btn:hover {
+    background-color: #9ca2af;
 }
 
 /* News Articles */
@@ -275,7 +346,13 @@ button:hover {
   border: 1px solid #4b5263;
   border-radius: 4px;
   margin-bottom: 1rem;
-  overflow: hidden; /* Clear the float from the delete button */
+  overflow: hidden; /* Clear the float from the action buttons */
+}
+
+.article-actions {
+    float: right;
+    display: flex;
+    gap: 0.5rem;
 }
 
 #news-container {
