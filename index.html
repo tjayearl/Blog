@@ -21,7 +21,15 @@
                 </div>
                 <div class="header-actions">
                     <button class="subscribe-btn">Subscribe</button>
-                    <button id="sign-in-btn" class="signin-btn">Sign In / Register</button>
+                    <div class="signin-container">
+                        <button id="sign-in-btn" class="signin-btn">Sign In / Register</button>
+                        <div id="login-panel" class="login-dropdown hidden">
+                            <h2>Admin Login</h2>
+                            <input type="text" id="username" placeholder="Username">
+                            <input type="password" id="password" placeholder="Password">
+                            <button id="login-btn">Login</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -58,13 +66,6 @@
     </div>
 
     <main>
-        <section id="login-section" class="container hidden">
-            <h2>Admin Login</h2>
-            <input type="text" id="username" placeholder="Username">
-            <input type="password" id="password" placeholder="Password">
-            <button id="login-btn">Login</button>
-        </section>
-
         <section id="admin-panel" class="container hidden">
             <h2>Add New Article</h2>
             <input type="text" id="news-title" placeholder="Article Title">
