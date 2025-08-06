@@ -55,6 +55,14 @@
                         <a href="#" class="category-link" data-category="Lifestyle">Lifestyle</a>
                     </div>
                 </div>
+                <div class="dropdown">
+                    <a href="#" class="nav-link">Opinion / Editorial <i class="fas fa-caret-down"></i></a>
+                    <div class="dropdown-content" id="opinion-editorial-dropdown">
+                        <a href="#" class="category-link" data-category="Opinion">Opinion pieces</a>
+                        <a href="#" class="category-link" data-category="Guest Column">Guest columns</a>
+                        <a href="#" class="category-link" data-category="Editorial Pick">Editorial picks</a>
+                    </div>
+                </div>
                 <a href="#" class="nav-link" data-target="multimedia-section">Multimedia</a>
                 <a href="#" class="nav-link" data-target="about-section">About Us</a>
                 <a href="#" class="nav-link" data-target="contact-section">Contact</a>
@@ -88,6 +96,9 @@
                 <option value="Entertainment">Entertainment</option>
                 <option value="Sports">Sports</option>
                 <option value="Lifestyle">Lifestyle</option>
+                <option value="Opinion">Opinion</option>
+                <option value="Guest Column">Guest Column</option>
+                <option value="Editorial Pick">Editorial Pick</option>
             </select>
             <textarea id="news-content" placeholder="Article Content"></textarea>
             <button id="add-news">Add News</button>
@@ -223,7 +234,65 @@
             </div>
         </section>
 
-        <div id="news-container" class="container"></div>
+        <div id="home-content-wrapper" class="home-layout">
+            <div class="main-column">
+                <section id="featured-story-section" class="hero-section hidden">
+                    <!-- Featured story will be rendered here by JS -->
+                    <div class="hero-content">
+                        <h2 id="hero-title"></h2>
+                        <p id="hero-summary"></p>
+                        <a href="#" id="hero-read-more" class="btn-read-more">Read More</a>
+                    </div>
+                </section>
+                <section id="latest-news-section">
+                    <h2>Latest News</h2>
+                    <div id="latest-news-grid">
+                        <!-- Latest news will be rendered here by JS -->
+                    </div>
+                </section>
+                <div id="news-container">
+                    <!-- Articles will be rendered here by JS -->
+                </div>
+            </div>
+            <aside id="sidebar">
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Trending Stories</h3>
+                    <ul id="trending-stories-list" class="widget-list">
+                        <!-- In a real app, JS would populate this -->
+                        <li><a href="#">The Future of AI in Journalism</a></li>
+                        <li><a href="#">Local Election Results: A Surprising Turnout</a></li>
+                        <li><a href="#">New Tech Gadgets Reviewed for 2024</a></li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Most Read</h3>
+                    <ol id="most-read-list" class="widget-list">
+                         <!-- In a real app, JS would populate this -->
+                        <li><a href="#">A Deep Dive into Global Business Trends</a></li>
+                        <li><a href="#">Sports Season Highlights and Predictions</a></li>
+                        <li><a href="#">Lifestyle Changes for a Productive Year</a></li>
+                    </ol>
+                </div>
+
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Newsletter</h3>
+                    <form id="sidebar-newsletter-form" class="widget-form">
+                        <input type="email" id="sidebar-email" placeholder="Your email address">
+                        <button type="submit">Sign Up</button>
+                    </form>
+                </div>
+
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Follow Us</h3>
+                    <div class="sidebar-social-media">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a><a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+                <div class="sidebar-widget ad-widget"><div class="ad-placeholder"><span>Advertisement</span></div></div>
+            </aside>
+        </div>
     </main>
 
     <footer>

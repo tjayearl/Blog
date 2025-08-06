@@ -11,13 +11,16 @@ let currentCategoryFilter = 'home'; // To track the current category filter. 'ho
 // --- DOM ELEMENTS ---
 // Sections
 const adminPanel = document.getElementById("admin-panel");
+const homeContentWrapper = document.getElementById('home-content-wrapper');
 const newsContainer = document.getElementById("news-container");
 const notificationContainer = document.getElementById('notification-container');
+const latestNewsGrid = document.getElementById('latest-news-grid');
+const featuredStorySection = document.getElementById('featured-story-section');
 const aboutSection = document.getElementById("about-section");
 const contactForm = document.getElementById('contact-section');
 const opinionsSection = document.getElementById('opinions-section');
 const multimediaSection = document.getElementById('multimedia-section');
-const mainContentSections = [adminPanel, newsContainer, aboutSection, contactForm, opinionsSection, multimediaSection];
+const mainContentSections = [adminPanel, homeContentWrapper, aboutSection, contactForm, opinionsSection, multimediaSection];
 
 // Buttons & Links
 const loginBtn = document.getElementById("login-btn");
@@ -27,6 +30,7 @@ const subscribeBtn = document.querySelector('.subscribe-btn');
 const signInBtn = document.getElementById('sign-in-btn');
 const hamburgerMenu = document.getElementById('hamburger-menu');
 const mainNav = document.getElementById('main-nav');
+const heroReadMoreBtn = document.getElementById('hero-read-more');
 const categoriesDropdown = document.getElementById('categories-dropdown');
 const submitOpinionBtn = document.getElementById('submit-opinion-btn');
 const navLinks = document.querySelectorAll('nav .nav-link[data-target]');
@@ -46,6 +50,7 @@ const paymentPlansContainer = document.querySelector('.payment-plans');
 const declineSubscribeBtn = document.getElementById('decline-subscribe-btn');
 const confirmSubscribeBtn = document.getElementById('confirm-subscribe-btn');
 const footerNewsletterForm = document.getElementById('footer-newsletter-form');
+const sidebarNewsletterForm = document.getElementById('sidebar-newsletter-form');
 
 // --- FUNCTIONS ---
 
@@ -83,7 +88,7 @@ function showPage(target) {
     hideAllMainContent();
 
     if (target === 'home' || !target) { // Default to home
-        newsContainer.classList.remove('hidden');
+        homeContentWrapper.classList.remove('hidden');
     } else {
         const sectionToShow = document.getElementById(target);
         if (sectionToShow) {
@@ -189,7 +194,7 @@ function displayArticles() { // This function now only renders the state, it doe
 
     if (currentlyEditingIndex === originalIndex) {
       // Render the article in EDIT mode
-      const categories = ["Breaking News", "Local", "World", "Politics", "Business", "Tech", "Entertainment", "Sports", "Lifestyle"];
+      const categories = ["Breaking News", "Local", "World", "Politics", "Business", "Tech", "Entertainment", "Sports", "Lifestyle", "Opinion", "Guest Column", "Editorial Pick"];
       const categoryOptions = categories.map(cat =>
         `<option value="${escapeHTML(cat)}" ${article.category === cat ? 'selected' : ''}>${escapeHTML(cat)}</option>`
       ).join('');
@@ -263,6 +268,94 @@ function displayArticles() { // This function now only renders the state, it doe
 }
 
 /**
+ * Displays the most recent articles in the "Latest News" section.
+ * @param {number} count - The number of latest articles to display.
+ */
+function displayLatestNews(count = 3) {
+    if (!latestNewsGrid) return;
+
+    // Sort articles by creation date, newest first. The backend adds `createdAt`.
+    const sortedArticles = [...articles].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    // Take the top 'count' articles
+    const latestArticles = sortedArticles.slice(0, count);
+
+    latestNewsGrid.innerHTML = ''; // Clear previous content
+
+    if (latestArticles.length === 0) {
+        // Do not show a message, just leave it empty if no articles exist.
+        return;
+    }
+
+    latestArticles.forEach(article => {
+        const shortDescription = article.content.length > 100
+            ? escapeHTML(article.content.substring(0, 100)) + '...'
+            : escapeHTML(article.content);
+
+        const publishedDate = new Date(article.createdAt).toLocaleString('en-US', {
+            year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+        });
+
+        // Use a placeholder if no image is available
+        const imageUrl = article.imageUrl || 'https://images.unsplash.com/photo-1495020689067-958852a7765e?q=80&w=800';
+
+        const cardHTML = `
+            <div class="latest-news-card">
+                <a href="#" class="latest-news-link" data-category="${escapeHTML(article.category)}">
+                    <img src="${escapeHTML(imageUrl)}" alt="${escapeHTML(article.title)}" class="latest-news-thumbnail">
+                    <div class="latest-news-content">
+                        <h3>${escapeHTML(article.title)}</h3>
+                        <p class="latest-news-description">${shortDescription}</p>
+                        <span class="latest-news-date">${publishedDate}</span>
+                    </div>
+                </a>
+            </div>
+        `;
+        latestNewsGrid.innerHTML += cardHTML;
+    });
+}
+
+/**
+ * Displays the featured story in the hero section.
+ */
+function displayFeaturedStory() {
+    if (!featuredStorySection) return;
+
+    // Sort articles by creation date, newest first
+    const sortedArticles = [...articles].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    // Find the most recent "Breaking News" article with an image
+    let featuredArticle = sortedArticles.find(a => a.category === 'Breaking News' && a.imageUrl);
+
+    // If no breaking news with an image, find the most recent article of any category with an image
+    if (!featuredArticle) {
+        featuredArticle = sortedArticles.find(a => a.imageUrl);
+    }
+
+    if (featuredArticle) {
+        const heroTitle = document.getElementById('hero-title');
+        const heroSummary = document.getElementById('hero-summary');
+
+        heroTitle.textContent = featuredArticle.title;
+        heroSummary.textContent = featuredArticle.content.length > 200
+            ? escapeHTML(featuredArticle.content.substring(0, 200)) + '...'
+            : escapeHTML(featuredArticle.content);
+
+        // Set the background image of the hero section
+        featuredStorySection.style.backgroundImage = `url('${escapeHTML(featuredArticle.imageUrl)}')`;
+
+        // Store the category in the "Read More" button to handle clicks
+        heroReadMoreBtn.dataset.category = featuredArticle.category;
+
+        // Show the section
+        featuredStorySection.classList.remove('hidden');
+    } else {
+        // If no suitable article is found, keep the section hidden
+        featuredStorySection.classList.add('hidden');
+    }
+}
+
+/**
  * Fetches all articles from the backend API.
  */
 async function fetchArticles() {
@@ -270,6 +363,9 @@ async function fetchArticles() {
         const response = await fetch(`${API_URL}/posts`);
         if (!response.ok) throw new Error('Failed to fetch articles.');
         articles = await response.json();
+        // Now that we have articles, display all relevant sections
+        displayFeaturedStory();
+        displayLatestNews();
         displayArticles();
     } catch (error) {
         handleApiError(error, 'Could not load articles');
@@ -434,7 +530,7 @@ function updateAdminUI() {
     if (isAdminLoggedIn) {
         signInBtn.textContent = 'Logout';
         // Show admin panel only if on the home page
-        if (!newsContainer.classList.contains('hidden')) {
+        if (!homeContentWrapper.classList.contains('hidden')) {
             adminPanel.classList.remove('hidden');
         } else {
             adminPanel.classList.add('hidden');
@@ -744,6 +840,18 @@ footerNewsletterForm.addEventListener('submit', (e) => {
         showNotification('Please enter a valid email address.', 'error');
     }
 });
+
+sidebarNewsletterForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const emailInput = document.getElementById('sidebar-email');
+    if (emailInput.value && emailInput.checkValidity()) {
+        showNotification(`Thank you for subscribing with ${emailInput.value}!`);
+        emailInput.value = '';
+    } else {
+        showNotification('Please enter a valid email address.', 'error');
+    }
+});
+
 
 if (imageWidthSlider && imageWidthValue) {
     imageWidthSlider.addEventListener('input', () => {
