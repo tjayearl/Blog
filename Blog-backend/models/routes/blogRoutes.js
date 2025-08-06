@@ -46,7 +46,7 @@ router.post('/login', async (req, res) => {
         return res.status(400).json({ message: 'Username and password are required.' });
     }
 
-    const user = adminUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+    const user = adminUsers.find(u => u.username.toLowerCase() === username.trim().toLowerCase());
 
     if (!user) {
         return res.status(401).json({ message: 'Invalid credentials.' });
