@@ -6,7 +6,7 @@ let articles = []; // This will hold all our blog posts
 let currentlyEditingIndex = null; // To track which article is being edited
 let selectedPlan = 'monthly'; // Default selected plan
 let tickerText = 'This is a scrolling news ticker with the latest updates... Lorem ipsum dolor sit amet, consectetur adipiscing elit... Another breaking story follows...';
-let currentCategoryFilter = 'home'; // To track the current category filter. 'home' is a special filter.
+let currentCategoryFilter = 'all'; // To track the current category filter. 'all' shows everything.
 
 // --- DOM ELEMENTS ---
 // Sections
@@ -18,6 +18,7 @@ const latestNewsGrid = document.getElementById('latest-news-grid');
 const featuredStorySection = document.getElementById('featured-story-section');
 const aboutSection = document.getElementById("about-section");
 const contactForm = document.getElementById('contact-section');
+const sidebar = document.getElementById('sidebar');
 const opinionsSection = document.getElementById('opinions-section');
 const multimediaSection = document.getElementById('multimedia-section');
 const mainContentSections = [adminPanel, homeContentWrapper, aboutSection, contactForm, opinionsSection, multimediaSection];
@@ -50,6 +51,8 @@ const paymentPlansContainer = document.querySelector('.payment-plans');
 const declineSubscribeBtn = document.getElementById('decline-subscribe-btn');
 const confirmSubscribeBtn = document.getElementById('confirm-subscribe-btn');
 const footerNewsletterForm = document.getElementById('footer-newsletter-form');
+const trendingStoriesList = document.getElementById('trending-stories-list');
+const mostReadList = document.getElementById('most-read-list');
 const sidebarNewsletterForm = document.getElementById('sidebar-newsletter-form');
 
 // --- FUNCTIONS ---
@@ -205,6 +208,18 @@ function displayArticles() { // This function now only renders the state, it doe
             <label for="edit-show-on-home-${originalIndex}">Feature on Home Page</label>
         </div>
       `;
+      
+      const trendingCheckboxHTML = `
+        <div class="form-option">
+            <input type="checkbox" id="edit-is-trending-${originalIndex}" class="edit-is-trending" ${article.isTrending ? 'checked' : ''}>
+            <label for="edit-is-trending-${originalIndex}">Mark as Trending</label>
+        </div>`;
+
+      const mostReadCheckboxHTML = `
+        <div class="form-option">
+            <input type="checkbox" id="edit-is-most-read-${originalIndex}" class="edit-is-most-read" ${article.isMostRead ? 'checked' : ''}>
+            <label for="edit-is-most-read-${originalIndex}">Mark as Most Read</label>
+        </div>`;
 
       const imageControlsHTML = `
         <h3 class="sub-heading">Image Options</h3>
@@ -231,6 +246,8 @@ function displayArticles() { // This function now only renders the state, it doe
             <select class="edit-category">${categoryOptions}</select>
             <textarea class="edit-content">${escapeHTML(article.content)}</textarea>
             ${homeCheckboxHTML}
+            ${trendingCheckboxHTML}
+            ${mostReadCheckboxHTML}
             ${imageControlsHTML}
             <div class="edit-form-actions">
                 <button class="save-btn">Save Changes</button>
@@ -265,6 +282,45 @@ function displayArticles() { // This function now only renders the state, it doe
     }
     newsContainer.appendChild(articleEl);
   });
+}
+
+/**
+ * Renders a list of articles in a sidebar widget.
+ * @param {HTMLElement} listElement - The UL or OL element to populate.
+ * @param {Array<Object>} articlesToShow - The array of articles to display.
+ */
+function renderSidebarList(listElement, articlesToShow) {
+    listElement.innerHTML = ''; // Clear old list
+    if (articlesToShow.length === 0) {
+        listElement.innerHTML = '<li>No articles to show.</li>';
+        return;
+    }
+    articlesToShow.forEach(article => {
+        const li = document.createElement('li');
+        // Using a class for the link makes the event listener more specific
+        li.innerHTML = `<a href="#" class="sidebar-link" data-category="${escapeHTML(article.category)}">${escapeHTML(article.title)}</a>`;
+        listElement.appendChild(li);
+    });
+}
+
+/**
+ * Filters and displays articles marked as "Trending" in the sidebar.
+ */
+function displayTrendingStories() {
+    if (!trendingStoriesList) return;
+    // Get up to 5 most recent trending articles
+    const trending = articles.filter(a => a.isTrending).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+    renderSidebarList(trendingStoriesList, trending);
+}
+
+/**
+ * Filters and displays articles marked as "Most Read" in the sidebar.
+ */
+function displayMostReadArticles() {
+    if (!mostReadList) return;
+    // Get up to 5 most recent "most read" articles
+    const mostRead = articles.filter(a => a.isMostRead).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+    renderSidebarList(mostReadList, mostRead);
 }
 
 /**
@@ -366,6 +422,8 @@ async function fetchArticles() {
         // Now that we have articles, display all relevant sections
         displayFeaturedStory();
         displayLatestNews();
+        displayTrendingStories();
+        displayMostReadArticles();
         displayArticles();
     } catch (error) {
         handleApiError(error, 'Could not load articles');
@@ -421,6 +479,8 @@ async function addArticle() {
     const imagePositionInput = document.getElementById("news-image-position");
     const imageWidthInput = document.getElementById("news-image-width");
     const showOnHomeInput = document.getElementById("news-show-on-home");
+    const isTrendingInput = document.getElementById("news-is-trending");
+    const isMostReadInput = document.getElementById("news-is-most-read");
 
     if (titleInput.value && contentInput.value && categoryInput.value) {
         const newArticleCategory = categoryInput.value;
@@ -431,7 +491,9 @@ async function addArticle() {
             imageUrl: imageUrlInput.value.trim(),
             imagePosition: imagePositionInput.value,
             imageWidth: imageWidthInput.value,
-            showOnHome: showOnHomeInput.checked
+            showOnHome: showOnHomeInput.checked,
+            isTrending: isTrendingInput.checked,
+            isMostRead: isMostReadInput.checked
         };
 
         try {
@@ -450,6 +512,8 @@ async function addArticle() {
             imagePositionInput.value = "top";
             imageWidthInput.value = 100;
             showOnHomeInput.checked = false;
+            isTrendingInput.checked = false;
+            isMostReadInput.checked = false;
             if (imageWidthValue) imageWidthValue.textContent = '100%';
 
             showNotification("Article added successfully!");
@@ -495,6 +559,8 @@ async function saveArticle(index) {
     const newImagePosition = articleEl.querySelector('.edit-image-position').value;
     const newImageWidth = articleEl.querySelector('.edit-image-width').value;
     const newShowOnHome = articleEl.querySelector('.edit-show-on-home').checked;
+    const newIsTrending = articleEl.querySelector('.edit-is-trending').checked;
+    const newIsMostRead = articleEl.querySelector('.edit-is-most-read').checked;
 
     if (newTitle && newContent) {
         const updatedArticle = {
@@ -504,7 +570,9 @@ async function saveArticle(index) {
             imageUrl: newImageUrl.trim(),
             imagePosition: newImagePosition,
             imageWidth: newImageWidth,
-            showOnHome: newShowOnHome
+            showOnHome: newShowOnHome,
+            isTrending: newIsTrending,
+            isMostRead: newIsMostRead
         };
         try {
             const response = await fetch(`${API_URL}/posts/${articleId}`, {
@@ -514,6 +582,7 @@ async function saveArticle(index) {
             });
             if (!response.ok) throw new Error('Failed to update article.');
             showNotification("Article updated successfully!");
+            currentlyEditingIndex = null; // Exit edit mode on successful save
             await fetchArticles(); // Refetch to get updated list
         } catch (error) {
             handleApiError(error, 'Could not update article');
@@ -544,6 +613,7 @@ function updateAdminUI() {
         signInBtn.textContent = 'Sign In / Register';
         exitEditMode(); // Ensure we exit edit mode on logout
         adminPanel.classList.add('hidden');
+        loginPanel.classList.add('hidden');
     }
     // Re-render articles to show/hide delete buttons
     displayArticles();
@@ -737,6 +807,17 @@ mainNav.addEventListener('click', (e) => {
         const dropdown = dropdownLink.parentElement;
         dropdown.classList.toggle('active');
     }
+});
+
+sidebar.addEventListener('click', (e) => {
+    const link = e.target.closest('.sidebar-link');
+    if (!link) return;
+
+    e.preventDefault();
+    // For now, clicking a sidebar link just filters by that article's category.
+    // A more advanced implementation could scroll to the article itself.
+    currentCategoryFilter = link.dataset.category;
+    showPage('home');
 });
 
 newsContainer.addEventListener('click', (e) => {

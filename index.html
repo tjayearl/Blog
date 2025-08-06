@@ -43,6 +43,7 @@
                 <div class="dropdown">
                     <a href="#" class="nav-link">Categories <i class="fas fa-caret-down"></i></a>
                     <div class="dropdown-content" id="categories-dropdown">
+                        <a href="#" class="category-link" data-category="home">Featured on Home</a>
                         <a href="#" class="category-link" data-category="all">All Categories</a>
                         <a href="#" class="category-link" data-category="Breaking News">Breaking News</a>
                         <a href="#" class="category-link" data-category="Local">Local</a>
@@ -106,6 +107,15 @@
             <div class="form-option">
                 <input type="checkbox" id="news-show-on-home">
                 <label for="news-show-on-home">Feature on Home Page</label>
+            </div>
+
+            <div class="form-option">
+                <input type="checkbox" id="news-is-trending">
+                <label for="news-is-trending">Mark as Trending</label>
+            </div>
+            <div class="form-option">
+                <input type="checkbox" id="news-is-most-read">
+                <label for="news-is-most-read">Mark as Most Read</label>
             </div>
 
             <h3 class="sub-heading">Image Options (Optional)</h3>
@@ -258,20 +268,14 @@
                 <div class="sidebar-widget">
                     <h3 class="widget-title">Trending Stories</h3>
                     <ul id="trending-stories-list" class="widget-list">
-                        <!-- In a real app, JS would populate this -->
-                        <li><a href="#">The Future of AI in Journalism</a></li>
-                        <li><a href="#">Local Election Results: A Surprising Turnout</a></li>
-                        <li><a href="#">New Tech Gadgets Reviewed for 2024</a></li>
+                        <!-- JS will populate this -->
                     </ul>
                 </div>
 
                 <div class="sidebar-widget">
                     <h3 class="widget-title">Most Read</h3>
                     <ol id="most-read-list" class="widget-list">
-                         <!-- In a real app, JS would populate this -->
-                        <li><a href="#">A Deep Dive into Global Business Trends</a></li>
-                        <li><a href="#">Sports Season Highlights and Predictions</a></li>
-                        <li><a href="#">Lifestyle Changes for a Productive Year</a></li>
+                         <!-- JS will populate this -->
                     </ol>
                 </div>
 
