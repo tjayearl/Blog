@@ -280,15 +280,20 @@ function addArticle() {
     const imageWidthInput = document.getElementById("news-image-width");
 
     if (titleInput.value && contentInput.value && categoryInput.value) {
+        const newArticleCategory = categoryInput.value;
         articles.unshift({
             title: titleInput.value,
             content: contentInput.value,
-            category: categoryInput.value,
+            category: newArticleCategory,
             imageUrl: imageUrlInput.value.trim(),
             imagePosition: imagePositionInput.value,
             imageWidth: imageWidthInput.value
         });
         saveArticlesToStorage();
+
+        // Update the filter to show the category of the article just added.
+        currentCategoryFilter = newArticleCategory;
+
         displayArticles();
         titleInput.value = "";
         contentInput.value = "";
@@ -499,7 +504,8 @@ function handleSubmitOpinion() {
 }
 
 function escapeHTML(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    // Coerce to string to prevent errors on non-string types (like numbers) and handle null/undefined
+    return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 // --- EVENT LISTENERS ---
 
