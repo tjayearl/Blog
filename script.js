@@ -33,7 +33,6 @@ const dateTimeEl = document.getElementById('date-time');
 const loginPanel = document.getElementById('login-panel');
 const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
-const tickerContent = document.getElementById('ticker-text');
 
 // Modal Elements
 const modalOverlay = document.getElementById('modal-overlay');
@@ -84,14 +83,20 @@ function updateDateTime() {
 }
 
 /**
- * Updates the news ticker text in the DOM.
+ * Updates the news ticker text in the DOM and restarts its animation.
  */
 function updateTickerDOM() {
-    if (tickerContent) {
-        // By cloning and replacing the node, we restart the CSS animation
-        const newTickerContent = tickerContent.cloneNode(true);
-        newTickerContent.textContent = tickerText;
-        tickerContent.parentNode.replaceChild(newTickerContent, tickerContent);
+    const tickerContainer = document.querySelector('.ticker-content');
+    const tickerTextElement = document.getElementById('ticker-text');
+
+    if (tickerContainer && tickerTextElement) {
+        // 1. Update the text content
+        tickerTextElement.textContent = tickerText;
+
+        // 2. Force a restart of the CSS animation on the container
+        tickerContainer.style.animation = 'none';
+        tickerContainer.offsetHeight; /* This triggers a DOM reflow, which is needed to restart the animation */
+        tickerContainer.style.animation = null; /* This re-applies the animation from the stylesheet */
     }
 }
 
