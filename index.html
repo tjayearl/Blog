@@ -20,7 +20,7 @@
                     <a href="#"><i class="fab fa-linkedin-in"></i></a>
                 </div>
                 <div class="header-actions">
-                    <button class="subscribe-btn">Subscribe</button>
+                    <a href="subscribe.html" class="subscribe-btn">Subscribe</a>
                     <div class="signin-container">
                         <button id="sign-in-btn" class="signin-btn">Sign In / Register</button>
                         <div id="login-panel" class="login-dropdown hidden">
@@ -339,43 +339,5 @@
 
     <script src="script.js"></script>
 
-    <!-- Subscription Modal -->
-    <div id="modal-overlay" class="hidden">
-        <div id="subscribe-modal">
-            <button id="modal-close-btn" class="modal-close">&times;</button>
-            <h2>Subscribe for Premium Content</h2>
-            <p>Get access to exclusive articles, in-depth analysis, and an ad-free experience by subscribing to our platform.</p>
-
-            <div class="payment-plans">
-                <div class="plan-card" data-plan="monthly" data-price="9.99">
-                    <h4>Monthly</h4>
-                    <p class="price">$9.99<span>/month</span></p>
-                    <p class="desc">Billed monthly</p>
-                </div>
-                <div class="plan-card" data-plan="yearly" data-price="99.99">
-                    <div class="best-value">Best Value</div>
-                    <h4>Yearly</h4>
-                    <p class="price">$99.99<span>/year</span></p>
-                    <p class="desc">Save 15%</p>
-                </div>
-            </div>
-
-            <input type="email" id="subscribe-email" placeholder="Enter your email">
-
-            <div class="payment-methods">
-                <div class="payment-icons">
-                    <i class="fab fa-cc-visa"></i>
-                    <i class="fab fa-cc-mastercard"></i>
-                    <i class="fab fa-cc-paypal"></i>
-                    <i class="fab fa-cc-amex"></i>
-                </div>
-            </div>
-
-            <div class="modal-actions">
-                <button id="decline-subscribe-btn" class="decline-btn">No, Thanks</button>
-                <button id="confirm-subscribe-btn">Subscribe Now</button>
-            </div>
-        </div>
-    </div>
 </body>
 </html>

@@ -1,0 +1,11 @@
+/* subscribe.css */
+
+body {
+    background-color: #21252b; /* Slightly different background for this page */
+}
+
+.subscribe-page-main {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align to top */
+    padding: 4rem 

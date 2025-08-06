@@ -12,11 +12,11 @@ const router = express.Router();
 const adminUsers = [
     {
         username: 'Tjay Earl',
-        passwordHash: '$2a$10$2gzpDOAv4NYyaohABKeN6OheRZ4Cztf4.hXbzJhAt967RmQmGNRdW'
+        passwordHash: 'PASTE_THE_NEW_HASH_FOR_TJAY_FROM_YOUR_TERMINAL_HERE'
     },
     {
         username: 'Ines Kibe',
-        passwordHash: '$2a$10$ge3xwDqhlfdFaV/R84LXgOlSHQiTwJvzEvLPBJso8DDVXdXJ2.eyy'
+        passwordHash: 'PASTE_THE_NEW_HASH_FOR_INES_FROM_YOUR_TERMINAL_HERE'
     }
 ];
 
@@ -86,6 +86,25 @@ router.get('/posts', async (req, res) => {
     }
 });
 
+// --- Multimedia Routes ---
+
+// GET /api/multimedia - Public
+router.get('/multimedia', async (req, res) => {
+    try {
+        const items = await Multimedia.find().sort({ createdAt: -1 });
+        res.json(items);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching multimedia items', error: error.message });
+    }
+});
+
+// POST /api/multimedia - Protected
+router.post('/multimedia', authMiddleware, async (req, res) => {
+    try {
+        const newItem = new Multimedia(req.body);
+        await newItem.save();
+        res.status(201).json(newItem);
+    }
 // POST /api/posts - Protected
 router.post('/posts', authMiddleware, async (req, res) => {
     try {
@@ -118,40 +137,5 @@ router.delete('/posts/:id', authMiddleware, async (req, res) => {
         res.status(500).json({ message: 'Error deleting post', error: error.message });
     }
 });
-
-// --- Multimedia Routes ---
-
-// GET /api/multimedia - Public
-router.get('/multimedia', async (req, res) => {
-    try {
-        const items = await Multimedia.find().sort({ createdAt: -1 });
-        res.json(items);
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching multimedia items', error: error.message });
-    }
-});
-
-// POST /api/multimedia - Protected
-router.post('/multimedia', authMiddleware, async (req, res) => {
-    try {
-        const newItem = new Multimedia(req.body);
-        await newItem.save();
-        res.status(201).json(newItem);
-    } catch (error) {
-        res.status(400).json({ message: 'Error creating multimedia item', error: error.message });
-    }
-});
-
-// DELETE /api/multimedia/:id - Protected
-router.delete('/multimedia/:id', authMiddleware, async (req, res) => {
-    try {
-        const deletedItem = await Multimedia.findByIdAndDelete(req.params.id);
-        if (!deletedItem) return res.status(404).json({ message: 'Multimedia item not found' });
-        res.json({ message: 'Multimedia item deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error deleting multimedia item', error: error.message });
-    }
-});
-
 
 module.exports = router;
