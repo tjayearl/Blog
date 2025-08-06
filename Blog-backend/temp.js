@@ -3,13 +3,13 @@ const bcrypt = require("bcryptjs");
 async function hashPasswords() {
     console.log("Generating password hashes for admin users...\n");
 
-    const tjayPassword = "Earlzone248Z";
+    const tjayPassword = "TjayTestPass1";
     const tjayHash = await bcrypt.hash(tjayPassword, 10);
     console.log(`--- Tjay Earl ---`);
     console.log(`Password: ${tjayPassword}`);
     console.log(`Hash: ${tjayHash}\n`);
 
-    const inesPassword = "KibeRocks2024"; // A secure, new password for Ines
+    const inesPassword = "InesTestPass2";
     const inesHash = await bcrypt.hash(inesPassword, 10);
     console.log(`--- Ines Kibe ---`);
     console.log(`Password: ${inesPassword}`);

@@ -11,11 +11,11 @@ const router = express.Router();
 const adminUsers = [
     {
         username: 'Tjay Earl',
-        passwordHash: '$2a$10$REPLACE_WITH_TJAYS_HASH'
+        passwordHash: '$2a$10$2gzpDOAv4NYyaohABKeN6OheRZ4Cztf4.hXbzJhAt967RmQmGNRdW'
     },
     {
         username: 'Ines Kibe',
-        passwordHash: '$2a$10$REPLACE_WITH_INES_HASH'
+        passwordHash: '$2a$10$ge3xwDqhlfdFaV/R84LXgOlSHQiTwJvzEvLPBJso8DDVXdXJ2.eyy'
     }
 ];
 
@@ -38,6 +38,13 @@ const authMiddleware = (req, res, next) => {
 
 
 // --- Routes ---
+
+// GET /api/verify-token - Protected route to check token validity
+router.get('/verify-token', authMiddleware, (req, res) => {
+    // If authMiddleware passes without error, the token is valid.
+    // We can optionally send back the user info from the token payload.
+    res.json({ message: 'Token is valid.', user: req.user });
+});
 
 // POST /api/login
 router.post('/login', async (req, res) => {

@@ -868,22 +868,39 @@ starRatingContainers.forEach(container => {
 
 // --- INITIALIZATION ---
 
-function init() {
+async function init() {
     const token = getAuthToken();
     if (token) {
-        // A more robust solution would verify the token with the backend here
-        isAdminLoggedIn = true;
+        try {
+            const response = await fetch(`${API_URL}/verify-token`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                isAdminLoggedIn = true;
+            } else {
+                // Token is invalid or expired, so remove it
+                localStorage.removeItem('authToken');
+            }
+        } catch (error) {
+            // Server is likely down, we can't verify, so stay logged out.
+            console.error('Could not verify token (server might be down):', error);
+        }
     }
 
+    // Now that login status is determined, proceed with setup
     updateDateTime(); // Call once to avoid delay
     setInterval(updateDateTime, 1000); // Update every second
 
-    fetchArticles(); // Fetch articles from API instead of localStorage
+    // Fetch articles and update the main UI.
+    // fetchArticles() will display the main content.
+    // updateAdminUI() will then correctly show/hide admin features on top of that.
+    await fetchArticles();
+    updateAdminUI();
+
+    // Setup other parts of the page
     document.getElementById('copyright-year').textContent = new Date().getFullYear();
     loadTickerFromStorage();
-    // Set default selected plan on init
     paymentPlansContainer.querySelector(`.plan-card[data-plan='${selectedPlan}']`).classList.add('selected');
-    updateAdminUI(); // Set initial UI based on login state
     updateTickerDOM();
 }
 
