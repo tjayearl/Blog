@@ -23,6 +23,10 @@ const blogSchema = new mongoose.Schema({
     type: Number, // Percentage
     default: 100,
   },
+  showOnHome: {
+    type: Boolean,
+    default: false,
+  },
   date: {
     type: Date,
     default: Date.now,

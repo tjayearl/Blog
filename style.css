@@ -14,6 +14,9 @@ body {
   padding: 0;
   /* Prevent horizontal scrolling from long content or layout shifts */
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   /* Apply better word wrapping globally to handle long, unbreakable strings */
   overflow-wrap: break-word;
 }
@@ -185,6 +188,7 @@ main {
   gap: 2rem;
   padding: 2rem;
   width: 100%;
+  flex-grow: 1;
 }
 
 /* Notification Styles */
@@ -317,6 +321,7 @@ h2 {
 /* Form elements styling */
 input[type="text"],
 input[type="password"],
+input[type="email"],
 select,
 textarea {
   width: 100%; /* Simplified thanks to box-sizing: border-box */
@@ -332,6 +337,19 @@ textarea {
 textarea {
   resize: vertical;
   min-height: 120px;
+}
+
+.form-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+.form-option input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.75rem;
+    margin-bottom: 0;
 }
 
 /* Button Styles */
@@ -496,6 +514,13 @@ button:hover {
   color: #98c379; /* A nice green for article titles */
 }
 
+.empty-message {
+    text-align: center;
+    font-style: italic;
+    color: #abb2bf;
+    padding: 2rem;
+}
+
 /* About Us Section */
 .creators-container {
   display: flex;
@@ -510,6 +535,91 @@ button:hover {
   flex: 1;
 }
 .creator-card h4 { margin-top: 0; color: #ffffff; }
+
+/* --- Footer Styles --- */
+footer {
+    background-color: #1c1f26;
+    color: #abb2bf;
+    padding: 2rem;
+    border-top: 1px solid #3a3f4b;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto 2rem auto;
+}
+
+.footer-column {
+    flex: 1;
+    min-width: 220px;
+}
+
+.footer-column h4 {
+    color: #ffffff;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    border-bottom: 1px solid #61afef;
+    padding-bottom: 0.5rem;
+    display: inline-block;
+}
+
+.footer-column p {
+    margin: 0 0 0.5rem 0;
+    line-height: 1.6;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-links a, .footer-column a {
+    color: #abb2bf;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover, .footer-column a:hover {
+    color: #61afef;
+}
+
+.footer-bottom {
+    text-align: center;
+    border-top: 1px solid #3a3f4b;
+    padding-top: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-social-media {
+    margin-bottom: 1rem;
+}
+
+.footer-social-media a {
+    color: #abb2bf;
+    margin: 0 0.75rem;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+.footer-social-media a:hover {
+    color: #61afef;
+}
+
+.copyright {
+    margin: 0;
+    font-size: 0.9rem;
+}
 
 /* --- Modal Styles --- */
 #modal-overlay {
@@ -747,6 +857,10 @@ button:hover {
     .creators-container {
         flex-direction: column;
     }
+    .footer-container {
+        flex-direction: column;
+    }
+
     .dropdown .fa-caret-down {
         transition: transform 0.3s ease;
     }

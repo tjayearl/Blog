@@ -1,14 +1,12 @@
 // --- STATE ---
-const ADMIN_ACCOUNTS = [
-    { user: "Tjay Earl", pass: "1884" },
-    { user: "Ines Kibe", pass: "1454" }
-];
+const API_URL = 'http://localhost:5000/api'; // Your backend API URL
+
 let isAdminLoggedIn = false;
 let articles = []; // This will hold all our blog posts
 let currentlyEditingIndex = null; // To track which article is being edited
 let selectedPlan = 'monthly'; // Default selected plan
 let tickerText = 'This is a scrolling news ticker with the latest updates... Lorem ipsum dolor sit amet, consectetur adipiscing elit... Another breaking story follows...';
-let currentCategoryFilter = 'all'; // To track the current category filter
+let currentCategoryFilter = 'home'; // To track the current category filter. 'home' is a special filter.
 
 // --- DOM ELEMENTS ---
 // Sections
@@ -46,8 +44,28 @@ const modalCloseBtn = document.getElementById('modal-close-btn');
 const paymentPlansContainer = document.querySelector('.payment-plans');
 const declineSubscribeBtn = document.getElementById('decline-subscribe-btn');
 const confirmSubscribeBtn = document.getElementById('confirm-subscribe-btn');
+const footerNewsletterForm = document.getElementById('footer-newsletter-form');
 
 // --- FUNCTIONS ---
+
+/**
+ * Gets the stored JWT from localStorage.
+ * @returns {string|null} The token or null if not found.
+ */
+function getAuthToken() {
+    return localStorage.getItem('authToken');
+}
+
+/**
+ * Returns the authorization headers for API requests.
+ * @returns {HeadersInit} The headers object.
+ */
+function getAuthHeaders() {
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+    };
+}
 
 /**
  * Hides all main content sections.
@@ -80,12 +98,13 @@ function showPage(target) {
  */
 function updateDateTime() {
     const now = new Date();
-    const options = {
+    const dateOptions = {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
     };
-    dateTimeEl.textContent = now.toLocaleDateString('en-US', options);
+    const timeString = now.toLocaleTimeString('en-US'); // e.g., 10:30:55 PM
+    dateTimeEl.textContent = `${now.toLocaleDateString('en-US', dateOptions)} | ${timeString}`;
 }
 
 /**
@@ -142,15 +161,29 @@ function handleUpdateTicker() {
 /**
  * Renders the list of articles to the DOM.
  */
-function displayArticles() {
+function displayArticles() { // This function now only renders the state, it doesn't fetch it.
     newsContainer.innerHTML = "";
-    const filteredArticles = articles.filter(article =>
-        currentCategoryFilter === 'all' || article.category === currentCategoryFilter
-    );
+    let filteredArticles;
+
+    if (currentCategoryFilter === 'home') {
+        filteredArticles = articles.filter(article => article.showOnHome);
+        if (filteredArticles.length === 0) {
+            newsContainer.innerHTML = '<p class="empty-message">No articles have been featured on the home page yet.</p>';
+            return;
+        }
+    } else {
+        filteredArticles = articles.filter(article =>
+            currentCategoryFilter === 'all' || article.category === currentCategoryFilter
+        );
+        if (filteredArticles.length === 0) {
+            newsContainer.innerHTML = `<p class="empty-message">No articles found in this category.</p>`;
+            return;
+        }
+    }
 
   filteredArticles.forEach((article) => {
     const originalIndex = articles.indexOf(article);
-    const articleEl = document.createElement("article");
+    const articleEl = document.createElement("article"); // Each article element gets its array index as a dataset attribute
     articleEl.dataset.index = originalIndex;
 
     if (currentlyEditingIndex === originalIndex) {
@@ -159,6 +192,13 @@ function displayArticles() {
       const categoryOptions = categories.map(cat =>
         `<option value="${escapeHTML(cat)}" ${article.category === cat ? 'selected' : ''}>${escapeHTML(cat)}</option>`
       ).join('');
+
+      const homeCheckboxHTML = `
+        <div class="form-option">
+            <input type="checkbox" id="edit-show-on-home-${originalIndex}" class="edit-show-on-home" ${article.showOnHome ? 'checked' : ''}>
+            <label for="edit-show-on-home-${originalIndex}">Feature on Home Page</label>
+        </div>
+      `;
 
       const imageControlsHTML = `
         <h3 class="sub-heading">Image Options</h3>
@@ -184,6 +224,7 @@ function displayArticles() {
             <input type="text" class="edit-title" value="${escapeHTML(article.title)}">
             <select class="edit-category">${categoryOptions}</select>
             <textarea class="edit-content">${escapeHTML(article.content)}</textarea>
+            ${homeCheckboxHTML}
             ${imageControlsHTML}
             <div class="edit-form-actions">
                 <button class="save-btn">Save Changes</button>
@@ -221,37 +262,17 @@ function displayArticles() {
 }
 
 /**
- * Saves articles to localStorage.
+ * Fetches all articles from the backend API.
  */
-function saveArticlesToStorage() {
-    localStorage.setItem('blogArticles', JSON.stringify(articles));
-}
-
-/**
- * Loads articles from localStorage.
- */
-function loadArticlesFromStorage() {
-    const storedArticles = localStorage.getItem('blogArticles');
-
-    if (storedArticles) {
-        articles = JSON.parse(storedArticles);
-    } else {
-        // Add some dummy articles if storage is empty
-        articles = [{
-            title: "Tech Advances in 2024",
-            content: "This year has seen incredible leaps in AI and quantum computing. From next-generation processors to AI-driven medical diagnostics, the landscape of technology is evolving at an unprecedented pace.",
-            category: "Tech",
-            imageUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop",
-            imagePosition: "top",
-            imageWidth: 100
-        }, {
-            title: "Local Park Gets a Facelift",
-            content: "The community-led initiative to renovate the downtown park is now complete, featuring new playgrounds, walking trails, and a beautiful garden that has the whole town buzzing. It's a testament to what we can achieve when we work together.",
-            category: "Local",
-            imageUrl: "https://images.unsplash.com/photo-1583324113626-46a4f54155b2?q=80&w=1932&auto=format&fit=crop",
-            imagePosition: "left",
-            imageWidth: 40
-        }, ];
+async function fetchArticles() {
+    try {
+        const response = await fetch(`${API_URL}/posts`);
+        if (!response.ok) throw new Error('Failed to fetch articles.');
+        articles = await response.json();
+        displayArticles();
+    } catch (error) {
+        console.error(error);
+        showNotification('Could not load articles from the server.', 'error');
     }
 }
 
@@ -259,50 +280,74 @@ function loadArticlesFromStorage() {
  * Deletes an article and re-renders the list.
  * @param {number} index - The index of the article to delete.
  */
-function deleteArticle(index) {
+async function deleteArticle(index) {
     if (!isAdminLoggedIn) return; // Extra security check
+    const articleId = articles[index]._id;
     if (confirm('Are you sure you want to delete this article?')) {
-        articles.splice(index, 1);
-        saveArticlesToStorage();
-        displayArticles();
+        try {
+            const response = await fetch(`${API_URL}/posts/${articleId}`, {
+                method: 'DELETE',
+                headers: getAuthHeaders()
+            });
+            if (!response.ok) throw new Error('Failed to delete article.');
+            showNotification('Article deleted successfully!');
+            await fetchArticles(); // Refetch all articles to ensure consistency
+        } catch (error) {
+            console.error(error);
+            showNotification('Could not delete article.', 'error');
+        }
     }
 }
 
 /**
  * Adds a new article to the list.
  */
-function addArticle() {
+async function addArticle() {
     const titleInput = document.getElementById("news-title");
     const contentInput = document.getElementById("news-content");
     const categoryInput = document.getElementById("news-category");
     const imageUrlInput = document.getElementById("news-image-url");
     const imagePositionInput = document.getElementById("news-image-position");
     const imageWidthInput = document.getElementById("news-image-width");
+    const showOnHomeInput = document.getElementById("news-show-on-home");
 
     if (titleInput.value && contentInput.value && categoryInput.value) {
         const newArticleCategory = categoryInput.value;
-        articles.unshift({
+        const newArticle = {
             title: titleInput.value,
             content: contentInput.value,
             category: newArticleCategory,
             imageUrl: imageUrlInput.value.trim(),
             imagePosition: imagePositionInput.value,
-            imageWidth: imageWidthInput.value
-        });
-        saveArticlesToStorage();
+            imageWidth: imageWidthInput.value,
+            showOnHome: showOnHomeInput.checked
+        };
 
-        // Update the filter to show the category of the article just added.
-        currentCategoryFilter = newArticleCategory;
+        try {
+            const response = await fetch(`${API_URL}/posts`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(newArticle)
+            });
+            if (!response.ok) throw new Error('Failed to create article.');
 
-        displayArticles();
-        titleInput.value = "";
-        contentInput.value = "";
-        categoryInput.value = "";
-        imageUrlInput.value = "";
-        imagePositionInput.value = "top";
-        imageWidthInput.value = 100;
-        if (imageWidthValue) imageWidthValue.textContent = '100%'; // Reset label
-        showNotification("Article added successfully!");
+            // Reset form
+            titleInput.value = "";
+            contentInput.value = "";
+            categoryInput.value = "";
+            imageUrlInput.value = "";
+            imagePositionInput.value = "top";
+            imageWidthInput.value = 100;
+            showOnHomeInput.checked = false;
+            if (imageWidthValue) imageWidthValue.textContent = '100%';
+
+            showNotification("Article added successfully!");
+            currentCategoryFilter = newArticleCategory; // Switch view to the new article's category
+            await fetchArticles(); // Refetch to get the new list with the new article
+        } catch (error) {
+            console.error(error);
+            showNotification('Could not create article.', 'error');
+        }
     } else {
         showNotification("Please fill in title, content, and category.", "error");
     }
@@ -329,27 +374,41 @@ function exitEditMode() {
  * Saves the updated content of an article.
  * @param {number} index - The index of the article to save.
  */
-function saveArticle(index) {
+async function saveArticle(index) {
     const articleEl = document.querySelector(`article[data-index='${index}']`);
+    const articleId = articles[index]._id;
+
     const newTitle = articleEl.querySelector('.edit-title').value;
     const newContent = articleEl.querySelector('.edit-content').value;
     const newCategory = articleEl.querySelector('.edit-category').value;
     const newImageUrl = articleEl.querySelector('.edit-image-url').value;
     const newImagePosition = articleEl.querySelector('.edit-image-position').value;
     const newImageWidth = articleEl.querySelector('.edit-image-width').value;
+    const newShowOnHome = articleEl.querySelector('.edit-show-on-home').checked;
 
     if (newTitle && newContent) {
-        articles[index] = {
+        const updatedArticle = {
             title: newTitle,
             content: newContent,
             category: newCategory,
             imageUrl: newImageUrl.trim(),
             imagePosition: newImagePosition,
-            imageWidth: newImageWidth
+            imageWidth: newImageWidth,
+            showOnHome: newShowOnHome
         };
-        saveArticlesToStorage();
-        exitEditMode(); // This will save and re-render the articles list
-        showNotification("Article updated successfully!");
+        try {
+            const response = await fetch(`${API_URL}/posts/${articleId}`, {
+                method: 'PATCH',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(updatedArticle)
+            });
+            if (!response.ok) throw new Error('Failed to update article.');
+            showNotification("Article updated successfully!");
+            await fetchArticles(); // Refetch to get updated list
+        } catch (error) {
+            console.error(error);
+            showNotification('Could not update article.', 'error');
+        }
     } else {
         showNotification('Title and content cannot be empty.', 'error');
     }
@@ -384,20 +443,29 @@ function updateAdminUI() {
 /**
  * Handles the admin login process.
  */
-function handleLogin() {
-    const user = usernameInput.value;
-    const pass = passwordInput.value;
-    const isAdmin = ADMIN_ACCOUNTS.some(account => account.user === user && account.pass === pass);
+async function handleLogin() {
+    const username = usernameInput.value;
+    const password = passwordInput.value;
 
-    if (isAdmin) {
+    try {
+        const response = await fetch(`${API_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Login failed.');
+
+        localStorage.setItem('authToken', data.token);
         isAdminLoggedIn = true;
         loginPanel.classList.add('hidden');
         usernameInput.value = '';
         passwordInput.value = '';
         updateAdminUI();
-        showNotification(`Welcome, ${user}!`);
-    } else {
-        showNotification('Invalid credentials. Please try again.', 'error');
+        showNotification(`Welcome, ${username}!`);
+    } catch (error) {
+        console.error(error);
+        showNotification(error.message, 'error');
     }
 }
 
@@ -405,6 +473,7 @@ function handleLogin() {
  * Handles the admin logout process.
  */
 function handleLogout() {
+    localStorage.removeItem('authToken');
     isAdminLoggedIn = false;
     updateAdminUI();
 }
@@ -651,6 +720,19 @@ contactForm.addEventListener('submit', (e) => {
     }
 });
 
+footerNewsletterForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const emailInput = document.getElementById('footer-email');
+    if (emailInput.value && emailInput.checkValidity()) {
+        // This could also trigger the main subscription modal
+        // For now, it just shows a notification.
+        showNotification(`Thank you for subscribing with ${emailInput.value}!`);
+        emailInput.value = '';
+    } else {
+        showNotification('Please enter a valid email address.', 'error');
+    }
+});
+
 if (imageWidthSlider && imageWidthValue) {
     imageWidthSlider.addEventListener('input', () => {
         imageWidthValue.textContent = `${imageWidthSlider.value}%`;
@@ -667,12 +749,21 @@ starRatingContainers.forEach(container => {
 // --- INITIALIZATION ---
 
 function init() {
-    updateDateTime();
-    loadArticlesFromStorage();
+    const token = getAuthToken();
+    if (token) {
+        // A more robust solution would verify the token with the backend here
+        isAdminLoggedIn = true;
+    }
+
+    updateDateTime(); // Call once to avoid delay
+    setInterval(updateDateTime, 1000); // Update every second
+
+    fetchArticles(); // Fetch articles from API instead of localStorage
+    document.getElementById('copyright-year').textContent = new Date().getFullYear();
     loadTickerFromStorage();
     // Set default selected plan on init
     paymentPlansContainer.querySelector(`.plan-card[data-plan='${selectedPlan}']`).classList.add('selected');
-    showPage('home'); // Show the home page by default
+    updateAdminUI(); // Set initial UI based on login state
     updateTickerDOM();
 }
 
