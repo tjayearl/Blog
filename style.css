@@ -1,3 +1,10 @@
+/* Universal Box Sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 /* General Body Styles */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -5,6 +12,10 @@ body {
   color: #abb2bf; /* Light gray text */
   margin: 0;
   padding: 0;
+  /* Prevent horizontal scrolling from long content or layout shifts */
+  overflow-x: hidden;
+  /* Apply better word wrapping globally to handle long, unbreakable strings */
+  overflow-wrap: break-word;
 }
 
 /* Top Bar Styles */
@@ -66,7 +77,6 @@ header {
   padding: 1rem 2rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   width: 100%;
-  box-sizing: border-box;
 }
 
 .header-container {
@@ -140,6 +150,33 @@ nav a.nav-link:hover {
   margin-left: 0.3rem;
 }
 
+/* Opinion/Rating Section */
+.rating-group {
+  margin-bottom: 2rem;
+}
+
+.rating-group h3 {
+  color: #c678dd; /* A nice purple for this section */
+  margin-bottom: 1rem;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.stars {
+  font-size: 2rem;
+  color: #e5c07b; /* Gold/yellow for stars */
+  cursor: pointer;
+}
+
+.stars i {
+  margin-right: 0.5rem;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.stars i:hover {
+  transform: scale(1.2);
+}
+
 /* Main content area */
 main {
   display: flex;
@@ -148,7 +185,6 @@ main {
   gap: 2rem;
   padding: 2rem;
   width: 100%;
-  box-sizing: border-box;
 }
 
 /* Notification Styles */
@@ -283,7 +319,7 @@ input[type="text"],
 input[type="password"],
 select,
 textarea {
-  width: calc(100% - 22px); /* 100% minus padding and border */
+  width: 100%; /* Simplified thanks to box-sizing: border-box */
   padding: 10px;
   margin-bottom: 1rem;
   border: 1px solid #4b5263;
@@ -291,10 +327,6 @@ textarea {
   background-color: #282c34;
   color: #abb2bf;
   font-size: 1rem;
-}
-
-select {
-    width: 100%; /* Override the calc for select */
 }
 
 textarea {
@@ -358,6 +390,14 @@ button:hover {
 
 .update-ticker-btn:hover {
     background-color: #d1af68;
+}
+
+#submit-opinion-btn {
+    background-color: #c678dd; /* Purple to match rating headers */
+}
+
+#submit-opinion-btn:hover {
+    background-color: #b068c7;
 }
 
 /* Styles for the inline article edit form */
@@ -627,4 +667,165 @@ button:hover {
     border-radius: 12px;
     font-size: 0.8rem;
     font-weight: bold;
+}
+
+/* Hamburger Menu (hidden by default) */
+.hamburger-menu {
+    display: none;
+    background: none;
+    border: none;
+    color: #abb2bf;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: auto;
+}
+
+.hamburger-menu:hover {
+    color: #61afef;
+    background: none;
+}
+
+/* --- Responsive Design --- */
+
+/* Tablets and larger phones */
+@media (max-width: 992px) {
+    .header-container {
+        position: relative;
+    }
+
+    .hamburger-menu {
+        display: block;
+    }
+
+    nav {
+        display: none; /* Hide nav by default */
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: #2c313a;
+        width: 250px;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+        border-radius: 0 0 0 8px;
+        box-shadow: -5px 5px 15px rgba(0,0,0,0.3);
+        border: 1px solid #4b5263;
+        border-top: none;
+        z-index: 999;
+    }
+
+    nav.nav-active {
+        display: flex; /* Show nav when active */
+    }
+
+    nav a.nav-link, .dropdown {
+        width: 100%;
+        padding: 0.5rem 0;
+    }
+
+    .dropdown-content {
+        position: static;
+        display: none; /* Controlled by hover/focus on larger screens, needs to be explicit for mobile */
+        box-shadow: none;
+        border: none;
+        background-color: transparent;
+        padding-left: 1rem;
+    }
+    
+    .dropdown.active .dropdown-content {
+        display: block;
+    }
+
+    /* Remove hover effect on touch devices */
+    @media (hover: none) {
+        .dropdown:hover .dropdown-content {
+            display: none;
+        }
+    }
+
+    .creators-container {
+        flex-direction: column;
+    }
+    .dropdown .fa-caret-down {
+        transition: transform 0.3s ease;
+    }
+    .dropdown.active .fa-caret-down {
+        transform: rotate(180deg);
+    }
+}
+
+/* Medium phones */
+@media (max-width: 768px) {
+    .top-bar-content {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    header, .top-bar {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    main {
+        padding: 1rem;
+    }
+
+    .container {
+        padding: 1.5rem;
+    }
+
+    .image-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .control-group {
+        width: 100%;
+    }
+
+    /* Stack floated images on tablets and smaller */
+    .article-image-container.pos-left,
+    .article-image-container.pos-right {
+        float: none;
+        width: 100% !important; /* Override inline style */
+        margin: 0 0 1rem 0;
+    }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+    .logo {
+        font-size: 1.5rem;
+    }
+
+    .social-media {
+        display: none; /* Hide social media on very small screens to save space */
+    }
+
+    .ticker-label {
+        display: none; /* Hide "Breaking" label */
+    }
+
+    .ticker-content p {
+        padding-left: 0.5rem;
+    }
+
+    .payment-plans {
+        flex-direction: column;
+    }
+
+    #subscribe-modal {
+        padding: 1.5rem;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    #subscribe-modal button {
+        width: 100%;
+    }
 }

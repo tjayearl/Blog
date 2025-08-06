@@ -35,7 +35,10 @@
         </div>
         <div class="header-container">
             <h1 class="logo">ClearView News</h1>
-            <nav>
+            <button class="hamburger-menu" id="hamburger-menu" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav id="main-nav">
                 <a href="#" class="nav-link" data-target="home">Home</a>
                 <div class="dropdown">
                     <a href="#" class="nav-link">Categories <i class="fas fa-caret-down"></i></a>
@@ -52,7 +55,7 @@
                         <a href="#" class="category-link" data-category="Lifestyle">Lifestyle</a>
                     </div>
                 </div>
-                <a href="#" class="nav-link">Opinions</a>
+                <a href="#" class="nav-link" data-target="opinions-section">Opinions</a>
                 <a href="#" class="nav-link" data-target="about-section">About Us</a>
                 <a href="#" class="nav-link" data-target="contact-section">Contact</a>
             </nav>
@@ -136,6 +139,28 @@
             <textarea id="contact-message" placeholder="Your Message"></textarea>
             <button type="submit">Send Message</button>
         </form>
+
+        <section id="opinions-section" class="container hidden">
+            <h2>Your Opinion Matters</h2>
+            <p>We value your feedback! Please take a moment to rate your experience with our website and news delivery.</p>
+
+            <div class="rating-group">
+                <h3>Overall Website Experience</h3>
+                <div class="stars" id="website-rating-stars">
+                    <i class="far fa-star" data-value="1"></i><i class="far fa-star" data-value="2"></i><i class="far fa-star" data-value="3"></i><i class="far fa-star" data-value="4"></i><i class="far fa-star" data-value="5"></i>
+                </div>
+            </div>
+
+            <div class="rating-group">
+                <h3>News Article Delivery</h3>
+                <div class="stars" id="delivery-rating-stars">
+                    <i class="far fa-star" data-value="1"></i><i class="far fa-star" data-value="2"></i><i class="far fa-star" data-value="3"></i><i class="far fa-star" data-value="4"></i><i class="far fa-star" data-value="5"></i>
+                </div>
+            </div>
+
+            <textarea id="opinion-comments" placeholder="Any additional comments? (Optional)"></textarea>
+            <button id="submit-opinion-btn">Submit Feedback</button>
+        </section>
 
         <div id="news-container" class="container"></div>
     </main>

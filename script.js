@@ -17,7 +17,8 @@ const newsContainer = document.getElementById("news-container");
 const notificationContainer = document.getElementById('notification-container');
 const aboutSection = document.getElementById("about-section");
 const contactForm = document.getElementById('contact-section');
-const mainContentSections = [adminPanel, newsContainer.parentElement, aboutSection, contactForm];
+const opinionsSection = document.getElementById('opinions-section');
+const mainContentSections = [adminPanel, newsContainer, aboutSection, contactForm, opinionsSection];
 
 // Buttons & Links
 const loginBtn = document.getElementById("login-btn");
@@ -25,7 +26,10 @@ const addNewsBtn = document.getElementById("add-news");
 const updateTickerBtn = document.getElementById('update-ticker-btn');
 const subscribeBtn = document.querySelector('.subscribe-btn');
 const signInBtn = document.getElementById('sign-in-btn');
+const hamburgerMenu = document.getElementById('hamburger-menu');
+const mainNav = document.getElementById('main-nav');
 const categoriesDropdown = document.getElementById('categories-dropdown');
+const submitOpinionBtn = document.getElementById('submit-opinion-btn');
 const navLinks = document.querySelectorAll('nav .nav-link[data-target]');
 
 // Header Elements
@@ -198,8 +202,15 @@ function displayArticles() {
 
       const categoryHTML = article.category ? `<div class="article-meta">Category: ${escapeHTML(article.category)}</div>` : '';
 
+      const imageHTML = article.imageUrl ?
+        `<div class="article-image-container pos-${escapeHTML(article.imagePosition)}" style="width: ${escapeHTML(article.imageWidth || 100)}%;">
+            <img src="${escapeHTML(article.imageUrl)}" alt="${escapeHTML(article.title)}" class="article-image">
+         </div>` :
+        "";
+
       articleEl.innerHTML = `
         ${adminButtonsHTML}
+        ${imageHTML}
         ${categoryHTML}
         <h2>${escapeHTML(article.title)}</h2>
         <p>${escapeHTML(article.content).replace(/\n/g, '<br>')}</p>
@@ -318,9 +329,19 @@ function saveArticle(index) {
     const newTitle = articleEl.querySelector('.edit-title').value;
     const newContent = articleEl.querySelector('.edit-content').value;
     const newCategory = articleEl.querySelector('.edit-category').value;
+    const newImageUrl = articleEl.querySelector('.edit-image-url').value;
+    const newImagePosition = articleEl.querySelector('.edit-image-position').value;
+    const newImageWidth = articleEl.querySelector('.edit-image-width').value;
 
     if (newTitle && newContent) {
-        articles[index] = { title: newTitle, content: newContent, category: newCategory };
+        articles[index] = {
+            title: newTitle,
+            content: newContent,
+            category: newCategory,
+            imageUrl: newImageUrl.trim(),
+            imagePosition: newImagePosition,
+            imageWidth: newImageWidth
+        };
         saveArticlesToStorage();
         exitEditMode(); // This will save and re-render the articles list
         showNotification("Article updated successfully!");
@@ -398,6 +419,85 @@ function showNotification(message, type = 'success') {
     }, 4000);
 }
 
+/**
+ * Resets the opinion section to its initial state.
+ */
+function resetOpinionsSection() {
+    const websiteRatingStars = document.getElementById('website-rating-stars');
+    const deliveryRatingStars = document.getElementById('delivery-rating-stars');
+
+    if (websiteRatingStars) websiteRatingStars.dataset.rating = 0;
+    if (deliveryRatingStars) deliveryRatingStars.dataset.rating = 0;
+
+    document.getElementById('opinion-comments').value = '';
+    document.querySelectorAll('.stars i').forEach(star => {
+        star.classList.remove('fas');
+        star.classList.add('far');
+    });
+}
+
+/**
+ * Handles the hover effect over the rating stars.
+ * @param {MouseEvent} e - The mouse event.
+ */
+function handleStarHover(e) {
+    if (!e.target.matches('.fa-star')) return;
+    const stars = Array.from(e.currentTarget.children);
+    const hoverIndex = stars.indexOf(e.target);
+    stars.forEach((star, index) => {
+        star.classList.toggle('fas', index <= hoverIndex);
+        star.classList.toggle('far', index > hoverIndex);
+    });
+}
+
+/**
+ * Handles when the mouse leaves the star container.
+ * @param {MouseEvent} e - The mouse event.
+ */
+function handleStarMouseOut(e) {
+    const stars = Array.from(e.currentTarget.children);
+    const currentRating = parseInt(e.currentTarget.dataset.rating || '0', 10);
+    stars.forEach((star, index) => {
+        star.classList.toggle('fas', index < currentRating);
+        star.classList.toggle('far', index >= currentRating);
+    });
+}
+
+/**
+ * Handles clicking on a star to set the rating.
+ * @param {MouseEvent} e - The mouse event.
+ */
+function handleStarClick(e) {
+    if (!e.target.matches('.fa-star')) return;
+    const starContainer = e.currentTarget;
+    const stars = Array.from(starContainer.children);
+    const clickedIndex = stars.indexOf(e.target);
+    starContainer.dataset.rating = clickedIndex + 1;
+}
+
+/**
+ * Handles submitting the user's opinion.
+ */
+function handleSubmitOpinion() {
+    const websiteRating = document.getElementById('website-rating-stars').dataset.rating || 0;
+    const deliveryRating = document.getElementById('delivery-rating-stars').dataset.rating || 0;
+    const comments = document.getElementById('opinion-comments').value;
+
+    if (websiteRating > 0 && deliveryRating > 0) {
+        // In a real app, you'd send this data to a server.
+        // For now, we'll just show a notification.
+        console.log({
+            websiteRating,
+            deliveryRating,
+            comments
+        });
+        showNotification("Thank you for your valuable feedback!");
+        resetOpinionsSection();
+    } else {
+        showNotification("Please provide a rating for both categories.", "error");
+    }
+}
+
 function escapeHTML(str) {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
@@ -425,12 +525,35 @@ signInBtn.addEventListener('click', (e) => {
 loginBtn.addEventListener('click', handleLogin);
 addNewsBtn.addEventListener('click', addArticle);
 updateTickerBtn.addEventListener('click', handleUpdateTicker);
+submitOpinionBtn.addEventListener('click', handleSubmitOpinion);
+
+hamburgerMenu.addEventListener('click', () => {
+    mainNav.classList.toggle('nav-active');
+});
 
 navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
         e.preventDefault();
         showPage(link.dataset.target);
+        // Close hamburger menu on link click
+        if (mainNav.classList.contains('nav-active')) {
+            mainNav.classList.remove('nav-active');
+        }
     });
+});
+
+mainNav.addEventListener('click', (e) => {
+    // Handle mobile dropdown clicks for touch devices
+    if (window.getComputedStyle(hamburgerMenu).display !== 'block') {
+        return; // Not in mobile view, let CSS hover handle it
+    }
+
+    const dropdownLink = e.target.closest('.dropdown > .nav-link');
+    if (dropdownLink) {
+        e.preventDefault();
+        const dropdown = dropdownLink.parentElement;
+        dropdown.classList.toggle('active');
+    }
 });
 
 newsContainer.addEventListener('click', (e) => {
@@ -446,6 +569,16 @@ newsContainer.addEventListener('click', (e) => {
         saveArticle(index);
     } else if (e.target.matches('.cancel-btn')) {
         exitEditMode();
+    }
+});
+
+newsContainer.addEventListener('input', (e) => {
+    // Delegate listener for width sliders in edit forms
+    if (e.target.matches('.edit-image-width')) {
+        const valueSpan = e.target.parentElement.querySelector('.edit-image-width-value');
+        if (valueSpan) {
+            valueSpan.textContent = `${e.target.value}%`;
+        }
     }
 });
 // Close login panel if clicking anywhere else on the page
@@ -510,6 +643,19 @@ contactForm.addEventListener('submit', (e) => {
     } else {
         showNotification("Please fill out all fields with a valid email.", "error");
     }
+});
+
+if (imageWidthSlider && imageWidthValue) {
+    imageWidthSlider.addEventListener('input', () => {
+        imageWidthValue.textContent = `${imageWidthSlider.value}%`;
+    });
+}
+
+const starRatingContainers = document.querySelectorAll('.stars');
+starRatingContainers.forEach(container => {
+    container.addEventListener('mouseover', handleStarHover);
+    container.addEventListener('mouseout', handleStarMouseOut);
+    container.addEventListener('click', handleStarClick);
 });
 
 // --- INITIALIZATION ---
