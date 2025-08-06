@@ -16,7 +16,8 @@ const notificationContainer = document.getElementById('notification-container');
 const aboutSection = document.getElementById("about-section");
 const contactForm = document.getElementById('contact-section');
 const opinionsSection = document.getElementById('opinions-section');
-const mainContentSections = [adminPanel, newsContainer, aboutSection, contactForm, opinionsSection];
+const multimediaSection = document.getElementById('multimedia-section');
+const mainContentSections = [adminPanel, newsContainer, aboutSection, contactForm, opinionsSection, multimediaSection];
 
 // Buttons & Links
 const loginBtn = document.getElementById("login-btn");
@@ -271,9 +272,24 @@ async function fetchArticles() {
         articles = await response.json();
         displayArticles();
     } catch (error) {
-        console.error(error);
-        showNotification('Could not load articles from the server.', 'error');
+        handleApiError(error, 'Could not load articles');
     }
+}
+
+/**
+ * Provides a centralized way to handle API errors and show user-friendly notifications.
+ * @param {Error} error - The error object from the catch block.
+ * @param {string} contextMessage - A message describing the action that failed (e.g., "Could not load articles").
+ */
+function handleApiError(error, contextMessage) {
+    console.error(`API Error (${contextMessage}):`, error);
+    let displayMessage = contextMessage;
+    if (error.message === 'Failed to fetch') {
+        displayMessage = `${contextMessage}. Could not connect to the server. Is it running?`;
+    } else if (error.message) {
+        displayMessage = error.message;
+    }
+    showNotification(displayMessage, 'error');
 }
 
 /**
@@ -293,8 +309,7 @@ async function deleteArticle(index) {
             showNotification('Article deleted successfully!');
             await fetchArticles(); // Refetch all articles to ensure consistency
         } catch (error) {
-            console.error(error);
-            showNotification('Could not delete article.', 'error');
+            handleApiError(error, 'Could not delete article');
         }
     }
 }
@@ -345,8 +360,7 @@ async function addArticle() {
             currentCategoryFilter = newArticleCategory; // Switch view to the new article's category
             await fetchArticles(); // Refetch to get the new list with the new article
         } catch (error) {
-            console.error(error);
-            showNotification('Could not create article.', 'error');
+            handleApiError(error, 'Could not create article');
         }
     } else {
         showNotification("Please fill in title, content, and category.", "error");
@@ -406,8 +420,7 @@ async function saveArticle(index) {
             showNotification("Article updated successfully!");
             await fetchArticles(); // Refetch to get updated list
         } catch (error) {
-            console.error(error);
-            showNotification('Could not update article.', 'error');
+            handleApiError(error, 'Could not update article');
         }
     } else {
         showNotification('Title and content cannot be empty.', 'error');
@@ -464,8 +477,7 @@ async function handleLogin() {
         updateAdminUI();
         showNotification(`Welcome, ${username}!`);
     } catch (error) {
-        console.error(error);
-        showNotification(error.message, 'error');
+        handleApiError(error, 'Login failed');
     }
 }
 
