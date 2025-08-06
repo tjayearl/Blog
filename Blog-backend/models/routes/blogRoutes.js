@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Post = require('../Post');
+const Multimedia = require('../Multimedia');
 
 const router = express.Router();
 
@@ -117,5 +118,40 @@ router.delete('/posts/:id', authMiddleware, async (req, res) => {
         res.status(500).json({ message: 'Error deleting post', error: error.message });
     }
 });
+
+// --- Multimedia Routes ---
+
+// GET /api/multimedia - Public
+router.get('/multimedia', async (req, res) => {
+    try {
+        const items = await Multimedia.find().sort({ createdAt: -1 });
+        res.json(items);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching multimedia items', error: error.message });
+    }
+});
+
+// POST /api/multimedia - Protected
+router.post('/multimedia', authMiddleware, async (req, res) => {
+    try {
+        const newItem = new Multimedia(req.body);
+        await newItem.save();
+        res.status(201).json(newItem);
+    } catch (error) {
+        res.status(400).json({ message: 'Error creating multimedia item', error: error.message });
+    }
+});
+
+// DELETE /api/multimedia/:id - Protected
+router.delete('/multimedia/:id', authMiddleware, async (req, res) => {
+    try {
+        const deletedItem = await Multimedia.findByIdAndDelete(req.params.id);
+        if (!deletedItem) return res.status(404).json({ message: 'Multimedia item not found' });
+        res.json({ message: 'Multimedia item deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting multimedia item', error: error.message });
+    }
+});
+
 
 module.exports = router;
