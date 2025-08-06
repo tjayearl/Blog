@@ -89,6 +89,23 @@
             <textarea id="news-content" placeholder="Article Content"></textarea>
             <button id="add-news">Add News</button>
 
+            <h3 class="sub-heading">Image Options (Optional)</h3>
+            <input type="text" id="news-image-url" placeholder="Image URL">
+            <div class="image-controls">
+                <div class="control-group">
+                    <label for="news-image-position">Position</label>
+                    <select id="news-image-position">
+                        <option value="top">Top (Full Width)</option>
+                        <option value="left">Float Left</option>
+                        <option value="right">Float Right</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="news-image-width">Width: <span id="image-width-value">100%</span></label>
+                    <input type="range" id="news-image-width" min="25" max="100" value="100">
+                </div>
+            </div>
+
             <hr class="admin-divider">
 
             <h3>Update News Ticker</h3>
@@ -120,7 +137,7 @@
             <button type="submit">Send Message</button>
         </form>
 
-        <div id="news-container"></div>
+        <div id="news-container" class="container"></div>
     </main>
 
     <script src="script.js"></script>

@@ -17,7 +17,7 @@ const newsContainer = document.getElementById("news-container");
 const notificationContainer = document.getElementById('notification-container');
 const aboutSection = document.getElementById("about-section");
 const contactForm = document.getElementById('contact-section');
-const mainContentSections = [adminPanel, newsContainer, aboutSection, contactForm];
+const mainContentSections = [adminPanel, newsContainer.parentElement, aboutSection, contactForm];
 
 // Buttons & Links
 const loginBtn = document.getElementById("login-btn");
@@ -33,6 +33,8 @@ const dateTimeEl = document.getElementById('date-time');
 const loginPanel = document.getElementById('login-panel');
 const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
+const imageWidthSlider = document.getElementById('news-image-width');
+const imageWidthValue = document.getElementById('image-width-value');
 
 // Modal Elements
 const modalOverlay = document.getElementById('modal-overlay');
@@ -57,7 +59,7 @@ function hideAllMainContent() {
 function showPage(target) {
     hideAllMainContent();
 
-    if (target === 'home') {
+    if (target === 'home' || !target) { // Default to home
         newsContainer.classList.remove('hidden');
     } else {
         const sectionToShow = document.getElementById(target);
@@ -154,11 +156,31 @@ function displayArticles() {
         `<option value="${escapeHTML(cat)}" ${article.category === cat ? 'selected' : ''}>${escapeHTML(cat)}</option>`
       ).join('');
 
+      const imageControlsHTML = `
+        <h3 class="sub-heading">Image Options</h3>
+        <input type="text" class="edit-image-url" value="${escapeHTML(article.imageUrl || '')}" placeholder="Image URL">
+        <div class="image-controls">
+            <div class="control-group">
+                <label>Position</label>
+                <select class="edit-image-position">
+                    <option value="top" ${article.imagePosition === 'top' ? 'selected' : ''}>Top (Full Width)</option>
+                    <option value="left" ${article.imagePosition === 'left' ? 'selected' : ''}>Float Left</option>
+                    <option value="right" ${article.imagePosition === 'right' ? 'selected' : ''}>Float Right</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Width: <span class="edit-image-width-value">${article.imageWidth || 100}%</span></label>
+                <input type="range" class="edit-image-width" min="25" max="100" value="${article.imageWidth || 100}">
+            </div>
+        </div>
+      `;
+
       articleEl.innerHTML = `
         <div class="edit-form">
             <input type="text" class="edit-title" value="${escapeHTML(article.title)}">
             <select class="edit-category">${categoryOptions}</select>
             <textarea class="edit-content">${escapeHTML(article.content)}</textarea>
+            ${imageControlsHTML}
             <div class="edit-form-actions">
                 <button class="save-btn">Save Changes</button>
                 <button class="cancel-btn">Cancel</button>
@@ -206,12 +228,18 @@ function loadArticlesFromStorage() {
         // Add some dummy articles if storage is empty
         articles = [{
             title: "Tech Advances in 2024",
-            content: "This year has seen incredible leaps in AI and quantum computing...",
-            category: "Tech"
+            content: "This year has seen incredible leaps in AI and quantum computing. From next-generation processors to AI-driven medical diagnostics, the landscape of technology is evolving at an unprecedented pace.",
+            category: "Tech",
+            imageUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop",
+            imagePosition: "top",
+            imageWidth: 100
         }, {
             title: "Local Park Gets a Facelift",
-            content: "The community-led initiative to renovate the downtown park is now complete...",
-            category: "Local"
+            content: "The community-led initiative to renovate the downtown park is now complete, featuring new playgrounds, walking trails, and a beautiful garden that has the whole town buzzing. It's a testament to what we can achieve when we work together.",
+            category: "Local",
+            imageUrl: "https://images.unsplash.com/photo-1583324113626-46a4f54155b2?q=80&w=1932&auto=format&fit=crop",
+            imagePosition: "left",
+            imageWidth: 40
         }, ];
     }
 }
@@ -236,18 +264,28 @@ function addArticle() {
     const titleInput = document.getElementById("news-title");
     const contentInput = document.getElementById("news-content");
     const categoryInput = document.getElementById("news-category");
+    const imageUrlInput = document.getElementById("news-image-url");
+    const imagePositionInput = document.getElementById("news-image-position");
+    const imageWidthInput = document.getElementById("news-image-width");
 
     if (titleInput.value && contentInput.value && categoryInput.value) {
         articles.unshift({
             title: titleInput.value,
             content: contentInput.value,
-            category: categoryInput.value
+            category: categoryInput.value,
+            imageUrl: imageUrlInput.value.trim(),
+            imagePosition: imagePositionInput.value,
+            imageWidth: imageWidthInput.value
         });
         saveArticlesToStorage();
         displayArticles();
         titleInput.value = "";
         contentInput.value = "";
         categoryInput.value = "";
+        imageUrlInput.value = "";
+        imagePositionInput.value = "top";
+        imageWidthInput.value = 100;
+        if (imageWidthValue) imageWidthValue.textContent = '100%'; // Reset label
         showNotification("Article added successfully!");
     } else {
         showNotification("Please fill in title, content, and category.", "error");

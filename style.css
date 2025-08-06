@@ -240,6 +240,32 @@ h2 {
     margin-top: 0;
 }
 
+.sub-heading {
+    color: #c678dd !important; /* Purple */
+    margin-top: 2rem !important;
+    font-size: 1.1rem;
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 1rem !important;
+}
+
+.image-controls {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.control-group {
+    flex: 1;
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
 .admin-divider {
     border: 0;
     height: 1px;
@@ -390,6 +416,28 @@ button:hover {
   letter-spacing: 0.5px;
 }
 
+.article-image-container {
+    margin-bottom: 1rem;
+}
+
+.article-image-container.pos-left {
+    float: left;
+    margin-right: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.article-image-container.pos-right {
+    float: right;
+    margin-left: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.article-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
 .article-actions {
     float: right;
     display: flex;
@@ -397,8 +445,10 @@ button:hover {
 }
 
 #news-container {
-    width: 100%;
-    max-width: 800px;
+    /* Removed fixed width to allow it to be a flex child */
+    /* background-color is inherited from .container class */
+    padding: 0;
+    border: none;
 }
 
 #news-container article h2 {
