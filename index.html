@@ -23,11 +23,15 @@
                     <a href="subscribe.html" class="subscribe-btn">Subscribe</a>
                     <div class="signin-container">
                         <button id="sign-in-btn" class="signin-btn">Sign In / Register</button>
-                        <div id="login-panel" class="login-dropdown hidden">
-                            <h2>Admin Login</h2>
-                            <input type="text" id="username" placeholder="Username">
-                            <input type="password" id="password" placeholder="Password">
-                            <button id="login-btn">Login</button>
+                        <div id="auth-panel" class="login-dropdown hidden">
+                            <!-- Login Form -->
+                            <div id="login-form-container">
+                                <h2>Login</h2>
+                                <input type="email" id="login-email" placeholder="Email" required>
+                                <input type="password" id="login-password" placeholder="Password" required>
+                                <button id="login-btn">Login</button>
+                                <p class="auth-switch">New here? <a href="register.html">Create an account</a></p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -140,6 +144,22 @@
             <h3>Update News Ticker</h3>
             <input type="text" id="ticker-text-input" placeholder="Enter breaking news text...">
             <button id="update-ticker-btn">Update Ticker</button>
+
+            <hr class="admin-divider">
+
+            <h3>Add Multimedia Content</h3>
+            <select id="multimedia-type">
+                <option value="video">Video</option>
+                <option value="gallery">Photo Gallery</option>
+                <option value="podcast">Podcast</option>
+            </select>
+            <input type="text" id="multimedia-title" placeholder="Title">
+            <input type="text" id="multimedia-description" placeholder="Short Description">
+            <input type="text" id="multimedia-thumbnail-url" placeholder="Thumbnail Image URL">
+            <input type="text" id="multimedia-content-url" placeholder="Content URL (e.g., YouTube embed, audio file)">
+            <button id="add-multimedia-btn">Add Multimedia</button>
+
+
         </section>
 
         <section id="about-section" class="container hidden">
@@ -190,57 +210,21 @@
 
         <section id="multimedia-section" class="container hidden">
             <h2>Multimedia</h2>
-            
             <div class="multimedia-category">
                 <h3><i class="fas fa-video"></i> Videos</h3>
-                <div class="multimedia-grid">
-                    <!-- Placeholder Video Cards -->
-                    <div class="multimedia-card">
-                        <div class="multimedia-thumbnail">
-                            <img src="https://images.unsplash.com/photo-1528901166007-3784c7dd3653?q=80&w=800" alt="Video Thumbnail">
-                            <div class="play-icon"><i class="fas fa-play"></i></div>
-                        </div>
-                        <h4>Investigative Report: The Downtown Project</h4>
-                        <p>A deep dive into the recent urban development project.</p>
-                    </div>
-                    <div class="multimedia-card">
-                        <div class="multimedia-thumbnail">
-                            <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=800" alt="Video Thumbnail">
-                            <div class="play-icon"><i class="fas fa-play"></i></div>
-                        </div>
-                        <h4>Interview with the Mayor</h4>
-                        <p>Exclusive one-on-one with the city's top official.</p>
-                    </div>
+                <div class="multimedia-grid" id="multimedia-videos">
+                    <!-- Video content will be rendered here by JS -->
                 </div>
             </div>
 
             <div class="multimedia-category">
                 <h3><i class="fas fa-images"></i> Photo Galleries</h3>
-                <div class="multimedia-grid">
-                    <!-- Placeholder Photo Gallery Cards -->
-                    <div class="multimedia-card">
-                        <div class="multimedia-thumbnail">
-                            <img src="https://images.unsplash.com/photo-1533228100845-08e280b73952?q=80&w=800" alt="Photo Gallery Thumbnail">
-                        </div>
-                        <h4>Festival of Lights: A Visual Journey</h4>
-                        <p>Stunning photos from the annual city festival.</p>
-                    </div>
-                </div>
+                <div class="multimedia-grid" id="multimedia-galleries"></div>
             </div>
 
             <div class="multimedia-category">
                 <h3><i class="fas fa-podcast"></i> Podcasts</h3>
-                <div class="multimedia-grid">
-                    <!-- Placeholder Podcast Cards -->
-                    <div class="multimedia-card podcast-card">
-                        <div class="multimedia-thumbnail">
-                            <img src="https://images.unsplash.com/photo-1590602843213-399434c036ee?q=80&w=800" alt="Podcast Thumbnail">
-                        </div>
-                        <h4>Weekly Wrap-Up: Ep. 12</h4>
-                        <p>Our editors discuss the biggest stories of the week.</p>
-                        <button class="listen-btn"><i class="fas fa-headphones-alt"></i> Listen Now</button>
-                    </div>
-                </div>
+                <div class="multimedia-grid" id="multimedia-podcasts"></div>
             </div>
         </section>
 
@@ -319,11 +303,8 @@
             </div>
             <div class="footer-column">
                 <h4>Newsletter</h4>
-                <p>Stay updated with our latest news.</p>
-                <form id="footer-newsletter-form">
-                    <input type="email" id="footer-email" placeholder="Your email address">
-                    <button type="submit">Subscribe</button>
-                </form>
+                <p>Stay updated with our latest news and get exclusive access.</p>
+                <a href="subscribe.html" class="btn-footer-subscribe">Subscribe Now</a>
             </div>
         </div>
         <div class="footer-bottom">

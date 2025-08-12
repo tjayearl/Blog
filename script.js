@@ -2,6 +2,12 @@
 const API_URL = 'http://localhost:5000/api'; // Your backend API URL
 
 let isAdminLoggedIn = false;
+let isUserLoggedIn = false; // Track regular user login status
+let loggedInUserEmail = null; // Store logged-in user's email
+const ADMIN_EMAIL = 'admin@clearview.news'; // Hardcoded admin email for simulation
+const ADMIN_PASSWORD = 'password123'; // Hardcoded admin password for simulation
+
+let multimediaItems = [];
 let articles = []; // This will hold all our blog posts
 let currentlyEditingIndex = null; // To track which article is being edited
 let selectedPlan = 'monthly'; // Default selected plan
@@ -27,7 +33,7 @@ const mainContentSections = [adminPanel, homeContentWrapper, aboutSection, conta
 const loginBtn = document.getElementById("login-btn");
 const addNewsBtn = document.getElementById("add-news");
 const updateTickerBtn = document.getElementById('update-ticker-btn');
-const subscribeBtn = document.querySelector('.subscribe-btn');
+const addMultimediaBtn = document.getElementById('add-multimedia-btn');
 const signInBtn = document.getElementById('sign-in-btn');
 const hamburgerMenu = document.getElementById('hamburger-menu');
 const mainNav = document.getElementById('main-nav');
@@ -38,19 +44,12 @@ const navLinks = document.querySelectorAll('nav .nav-link[data-target]');
 
 // Header Elements
 const dateTimeEl = document.getElementById('date-time');
-const loginPanel = document.getElementById('login-panel');
-const usernameInput = document.getElementById('username');
-const passwordInput = document.getElementById('password');
+const authPanel = document.getElementById('auth-panel');
+const loginEmailInput = document.getElementById('login-email');
+const loginPasswordInput = document.getElementById('login-password');
 const imageWidthSlider = document.getElementById('news-image-width');
 const imageWidthValue = document.getElementById('image-width-value');
 
-// Modal Elements
-const modalOverlay = document.getElementById('modal-overlay');
-const modalCloseBtn = document.getElementById('modal-close-btn');
-const paymentPlansContainer = document.querySelector('.payment-plans');
-const declineSubscribeBtn = document.getElementById('decline-subscribe-btn');
-const confirmSubscribeBtn = document.getElementById('confirm-subscribe-btn');
-const footerNewsletterForm = document.getElementById('footer-newsletter-form');
 const trendingStoriesList = document.getElementById('trending-stories-list');
 const mostReadList = document.getElementById('most-read-list');
 const sidebarNewsletterForm = document.getElementById('sidebar-newsletter-form');
@@ -100,6 +99,117 @@ function showPage(target) {
     }
     // Ensure admin UI is correctly shown/hidden for the new page
     updateAdminUI();
+}
+
+/**
+ * Fetches all multimedia items from the backend API.
+ */
+async function fetchMultimedia() {
+    try {
+        const response = await fetch(`${API_URL}/multimedia`);
+        if (!response.ok) throw new Error('Failed to fetch multimedia.');
+        multimediaItems = await response.json();
+        displayMultimedia();
+    } catch (error) {
+        handleApiError(error, 'Could not load multimedia content');
+    }
+}
+
+/**
+ * Renders the multimedia items to the DOM.
+ */
+function displayMultimedia() {
+    const videosContainer = document.getElementById('multimedia-videos');
+    const galleriesContainer = document.getElementById('multimedia-galleries');
+    const podcastsContainer = document.getElementById('multimedia-podcasts');
+
+    if (!videosContainer || !galleriesContainer || !podcastsContainer) return;
+
+    // Clear existing content
+    videosContainer.innerHTML = '';
+    galleriesContainer.innerHTML = '';
+    podcastsContainer.innerHTML = '';
+
+    if (multimediaItems.length === 0) {
+        videosContainer.innerHTML = '<p class="empty-message">No videos have been added yet.</p>';
+        return;
+    }
+
+    multimediaItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'multimedia-card';
+        card.dataset.id = item._id;
+
+        const adminDeleteBtn = isAdminLoggedIn ? `<button class="delete-btn" data-id="${item._id}">Delete</button>` : '';
+
+        let cardContent = `
+            ${adminDeleteBtn}
+            <div class="multimedia-thumbnail">
+                <a href="${escapeHTML(item.contentUrl)}" target="_blank" rel="noopener noreferrer">
+                    <img src="${escapeHTML(item.thumbnailUrl)}" alt="${escapeHTML(item.title)}">
+                    ${item.type === 'video' ? '<div class="play-icon"><i class="fas fa-play"></i></div>' : ''}
+                </a>
+            </div>
+            <h4>${escapeHTML(item.title)}</h4>
+            <p>${escapeHTML(item.description)}</p>
+        `;
+
+        if (item.type === 'podcast') {
+            card.classList.add('podcast-card');
+            cardContent += `<a href="${escapeHTML(item.contentUrl)}" target="_blank" rel="noopener noreferrer" class="listen-btn"><i class="fas fa-headphones-alt"></i> Listen Now</a>`;
+        }
+
+        card.innerHTML = cardContent;
+
+        if (item.type === 'video') videosContainer.appendChild(card);
+        else if (item.type === 'gallery') galleriesContainer.appendChild(card);
+        else if (item.type === 'podcast') podcastsContainer.appendChild(card);
+    });
+}
+
+/**
+ * Adds a new multimedia item.
+ */
+async function addMultimedia() {
+    const typeInput = document.getElementById('multimedia-type');
+    const titleInput = document.getElementById('multimedia-title');
+    const descriptionInput = document.getElementById('multimedia-description');
+    const thumbnailUrlInput = document.getElementById('multimedia-thumbnail-url');
+    const contentUrlInput = document.getElementById('multimedia-content-url');
+
+    const newItemData = {
+        type: typeInput.value,
+        title: titleInput.value,
+        description: descriptionInput.value,
+        thumbnailUrl: thumbnailUrlInput.value,
+        contentUrl: contentUrlInput.value
+    };
+
+    if (!newItemData.title || !newItemData.thumbnailUrl || !newItemData.contentUrl) {
+        showNotification('Title, Thumbnail URL, and Content URL are required.', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/multimedia`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(newItemData)
+        });
+        if (!response.ok) throw new Error('Failed to create multimedia item.');
+        showNotification('Multimedia item added successfully!');
+
+        // Reset form fields manually
+        typeInput.value = 'video';
+        titleInput.value = '';
+        descriptionInput.value = '';
+        thumbnailUrlInput.value = '';
+        contentUrlInput.value = '';
+
+        await fetchMultimedia(); // Refresh the list
+    } catch (error) {
+        handleApiError(error, 'Could not add multimedia item');
+    }
 }
 
 /**
@@ -469,6 +579,27 @@ async function deleteArticle(index) {
 }
 
 /**
+ * Deletes a multimedia item.
+ * @param {string} id - The ID of the item to delete.
+ */
+async function deleteMultimedia(id) {
+    if (!isAdminLoggedIn) return;
+    if (confirm('Are you sure you want to delete this multimedia item?')) {
+        try {
+            const response = await fetch(`${API_URL}/multimedia/${id}`, {
+                method: 'DELETE',
+                headers: getAuthHeaders()
+            });
+            if (!response.ok) throw new Error('Failed to delete multimedia item.');
+            showNotification('Multimedia item deleted successfully!');
+            await fetchMultimedia(); // Refresh the list
+        } catch (error) {
+            handleApiError(error, 'Could not delete multimedia item');
+        }
+    }
+}
+
+/**
  * Adds a new article to the list.
  */
 async function addArticle() {
@@ -596,63 +727,84 @@ async function saveArticle(index) {
  * Updates all UI elements based on the admin's login status.
  */
 function updateAdminUI() {
-    if (isAdminLoggedIn) {
+    if (isAdminLoggedIn || isUserLoggedIn) {
         signInBtn.textContent = 'Logout';
-        // Show admin panel only if on the home page
-        if (!homeContentWrapper.classList.contains('hidden')) {
-            adminPanel.classList.remove('hidden');
+        if (isAdminLoggedIn) {
+            // Show admin panel only if on the home page
+            if (!homeContentWrapper.classList.contains('hidden')) {
+                adminPanel.classList.remove('hidden');
+            } else {
+                adminPanel.classList.add('hidden');
+            }
+            // Populate ticker input with current text
+            const tickerTextInput = document.getElementById('ticker-text-input');
+            if (tickerTextInput) tickerTextInput.value = tickerText;
         } else {
-            adminPanel.classList.add('hidden');
-        }
-        // Populate ticker input with current text
-        const tickerTextInput = document.getElementById('ticker-text-input');
-        if (tickerTextInput) {
-            tickerTextInput.value = tickerText;
+            // User is logged in, but not an admin
         }
     } else {
         signInBtn.textContent = 'Sign In / Register';
         exitEditMode(); // Ensure we exit edit mode on logout
         adminPanel.classList.add('hidden');
-        loginPanel.classList.add('hidden');
+        authPanel.classList.add('hidden');
     }
     // Re-render articles to show/hide delete buttons
     displayArticles();
+    displayMultimedia();
 }
 
 /**
  * Handles the admin login process.
  */
 async function handleLogin() {
-    const username = usernameInput.value;
-    const password = passwordInput.value;
+    const email = loginEmailInput.value;
+    const password = loginPasswordInput.value;
 
-    try {
-        const response = await fetch(`${API_URL}/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'Login failed.');
-
-        localStorage.setItem('authToken', data.token);
-        isAdminLoggedIn = true;
-        loginPanel.classList.add('hidden');
-        usernameInput.value = '';
-        passwordInput.value = '';
-        updateAdminUI();
-        showNotification(`Welcome, ${username}!`);
-    } catch (error) {
-        handleApiError(error, 'Login failed');
+    if (!email || !password) {
+        showNotification('Please enter both email and password.', 'error');
+        return;
     }
+
+    // --- Admin Login Check (Frontend Simulation) ---
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        isAdminLoggedIn = true;
+        isUserLoggedIn = false;
+        loggedInUserEmail = email;
+        authPanel.classList.add('hidden');
+        loginEmailInput.value = '';
+        loginPasswordInput.value = '';
+        updateAdminUI();
+        showNotification(`Welcome, Admin! You are now in control.`);
+        return; // Stop further checks
+    }
+
+    // --- Regular User Login Check (Frontend Simulation) ---
+    const users = JSON.parse(localStorage.getItem('blogUsers')) || [];
+    const foundUser = users.find(user => user.email === email && user.password === password);
+
+    if (foundUser) {
+        isUserLoggedIn = true;
+        isAdminLoggedIn = false;
+        loggedInUserEmail = email;
+        authPanel.classList.add('hidden');
+        loginEmailInput.value = '';
+        loginPasswordInput.value = '';
+        updateAdminUI();
+        showNotification(`Welcome back, ${email}! You are subscribed to notifications.`, 'success');
+        return;
+    }
+
+    // --- If no match was found ---
+    showNotification('Invalid email or password.', 'error');
 }
 
 /**
  * Handles the admin logout process.
  */
 function handleLogout() {
-    localStorage.removeItem('authToken');
     isAdminLoggedIn = false;
+    isUserLoggedIn = false;
+    loggedInUserEmail = null;
     updateAdminUI();
 }
 
@@ -771,13 +923,14 @@ signInBtn.addEventListener('click', (e) => {
     if (isAdminLoggedIn) {
         handleLogout();
     } else {
-        loginPanel.classList.toggle('hidden');
+        authPanel.classList.toggle('hidden');
     }
 });
 
 loginBtn.addEventListener('click', handleLogin);
 addNewsBtn.addEventListener('click', addArticle);
 updateTickerBtn.addEventListener('click', handleUpdateTicker);
+addMultimediaBtn.addEventListener('click', addMultimedia);
 submitOpinionBtn.addEventListener('click', handleSubmitOpinion);
 
 hamburgerMenu.addEventListener('click', () => {
@@ -847,51 +1000,8 @@ newsContainer.addEventListener('input', (e) => {
 });
 // Close login panel if clicking anywhere else on the page
 document.addEventListener('click', (e) => {
-    if (!loginPanel.contains(e.target) && e.target !== signInBtn) {
-        loginPanel.classList.add('hidden');
-    }
-});
-
-subscribeBtn.addEventListener('click', () => {
-    modalOverlay.classList.remove('hidden');
-});
-
-modalCloseBtn.addEventListener('click', () => {
-    modalOverlay.classList.add('hidden');
-});
-
-declineSubscribeBtn.addEventListener('click', () => {
-    modalOverlay.classList.add('hidden');
-});
-
-// Close modal if clicking on the overlay itself
-modalOverlay.addEventListener('click', (e) => {
-    if (e.target === modalOverlay) {
-        modalOverlay.classList.add('hidden');
-    }
-});
-
-paymentPlansContainer.addEventListener('click', (e) => {
-    const clickedPlan = e.target.closest('.plan-card');
-    if (!clickedPlan) return;
-
-    // Update state
-    selectedPlan = clickedPlan.dataset.plan;
-
-    // Update UI
-    const allPlanCards = paymentPlansContainer.querySelectorAll('.plan-card');
-    allPlanCards.forEach(card => card.classList.remove('selected'));
-    clickedPlan.classList.add('selected');
-});
-
-confirmSubscribeBtn.addEventListener('click', () => {
-    const emailInput = document.getElementById('subscribe-email');
-    if (emailInput.value && emailInput.checkValidity()) {
-        showNotification(`Thank you for subscribing with ${emailInput.value}!`);
-        modalOverlay.classList.add('hidden');
-        emailInput.value = '';
-    } else {
-        showNotification('Please enter a valid email address.', 'error');
+    if (!authPanel.contains(e.target) && e.target !== signInBtn) {
+        authPanel.classList.add('hidden');
     }
 });
 
@@ -906,19 +1016,6 @@ contactForm.addEventListener('submit', (e) => {
         contactForm.reset();
     } else {
         showNotification("Please fill out all fields with a valid email.", "error");
-    }
-});
-
-footerNewsletterForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const emailInput = document.getElementById('footer-email');
-    if (emailInput.value && emailInput.checkValidity()) {
-        // This could also trigger the main subscription modal
-        // For now, it just shows a notification.
-        showNotification(`Thank you for subscribing with ${emailInput.value}!`);
-        emailInput.value = '';
-    } else {
-        showNotification('Please enter a valid email address.', 'error');
     }
 });
 
@@ -975,13 +1072,13 @@ async function init() {
     // Fetch articles and update the main UI.
     // fetchArticles() will display the main content.
     // updateAdminUI() will then correctly show/hide admin features on top of that.
+    await fetchMultimedia();
     await fetchArticles();
     updateAdminUI();
 
     // Setup other parts of the page
     document.getElementById('copyright-year').textContent = new Date().getFullYear();
     loadTickerFromStorage();
-    paymentPlansContainer.querySelector(`.plan-card[data-plan='${selectedPlan}']`).classList.add('selected');
     updateTickerDOM();
 }
 

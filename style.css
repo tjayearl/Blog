@@ -799,6 +799,12 @@ button:hover {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.multimedia-card .delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+}
 .multimedia-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 16px rgba(0,0,0,0.3);
@@ -806,6 +812,7 @@ button:hover {
 
 .multimedia-thumbnail {
     position: relative;
+    /* position: relative is needed for the absolute positioned delete button */
     cursor: pointer;
 }
 
@@ -941,6 +948,21 @@ footer {
 
 .footer-social-media a:hover {
     color: #61afef;
+}
+
+.btn-footer-subscribe {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #98c379; /* Green to match other subscribe buttons */
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-footer-subscribe:hover {
+    background-color: #84ac65;
 }
 
 .copyright {
