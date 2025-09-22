@@ -19,6 +19,14 @@
                     <a href="#"><i class="fab fa-instagram"></i></a>
                     <a href="#"><i class="fab fa-linkedin-in"></i></a>
                 </div>
+                <div class="theme-switcher">
+                    <i class="fas fa-sun"></i>
+                    <label class="switch">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                    <i class="fas fa-moon"></i>
+                </div>
                 <div class="header-actions">
                     <a href="subscribe.html" class="subscribe-btn">Subscribe</a>
                     <div class="signin-container">
@@ -90,6 +98,7 @@
 
             <h3>Add New Article</h3>
             <input type="text" id="news-title" placeholder="Article Title">
+            <textarea id="news-summary" placeholder="Article Summary / Hook (Optional)"></textarea>
             <select id="news-category" name="category">
                 <option value="" disabled selected>Select a Category</option>
                 <option value="Breaking News">Breaking News</option>
@@ -249,6 +258,12 @@
                 </div>
             </div>
             <aside id="sidebar">
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Search</h3>
+                    <div class="search-widget">
+                        <input type="text" id="search-input" placeholder="Search articles...">
+                    </div>
+                </div>
                 <div class="sidebar-widget">
                     <h3 class="widget-title">Trending Stories</h3>
                     <ul id="trending-stories-list" class="widget-list">
