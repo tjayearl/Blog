@@ -173,17 +173,67 @@
 
         <section id="about-section" class="container hidden">
             <h2>About Us</h2>
+            <p class="tagline">Delivering clarity in a complex world.</p>
             <p>Welcome to ClearView News, your number one source for all things news. We're dedicated to giving you the very best of information, with a focus on reliability, depth, and perspective.</p>
-            <h3>The Creators</h3>
-            <div class="creators-container">
-                <div class="creator-card">
-                    <h4>Tjay Earl</h4>
-                    <p>Co-founder and chief editor, Tjay brings a decade of journalistic experience to the table, ensuring every story is told with accuracy and passion.</p>
+            <div class="core-values">
+                <div class="value-item">
+                    <i class="fas fa-bullseye"></i><span>Accuracy</span>
                 </div>
-                <div class="creator-card">
-                    <h4>Ines Kibe</h4>
-                    <p>Co-founder and lead technology writer, Ines has a keen eye for the future and a talent for making complex topics accessible to everyone.</p>
+                <div class="value-item">
+                    <i class="fas fa-lightbulb"></i><span>Insight</span>
                 </div>
+                <div class="value-item">
+                    <i class="fas fa-handshake-angle"></i><span>Integrity</span>
+                </div>
+                <div class="value-item">
+                    <i class="fas fa-users"></i><span>Community</span>
+                </div>
+            </div>
+            <div class="about-layout">
+                <div class="about-founders">
+                    <h3>Meet The Founders</h3>
+                    <div class="profile-card">
+                        <img src="https://i.pravatar.cc/150?u=tjay" alt="Tjay Earl" class="profile-avatar">
+                        <div class="profile-info">
+                            <h4>Tjay Earl</h4>
+                            <h5><i class="fas fa-pen-nib"></i> Co-Founder & Chief Editor</h5>
+                            <p>Tjay brings a decade of journalistic experience to the table, ensuring every story is told with accuracy and passion.</p>
+                            <div class="profile-socials">
+                                <a href="#" aria-label="Tjay Earl on LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" aria-label="Tjay Earl on Twitter"><i class="fab fa-twitter"></i></a>
+                                <a href="mailto:tjay@clearview.news" aria-label="Email Tjay Earl"><i class="fas fa-envelope"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-card">
+                        <img src="https://i.pravatar.cc/150?u=ines" alt="Ines Kibe" class="profile-avatar">
+                        <div class="profile-info">
+                            <h4>Ines Kibe</h4>
+                            <h5><i class="fas fa-laptop-code"></i> Co-Founder & Lead Technology Writer</h5>
+                            <p>Ines has a keen eye for the future and a talent for making complex topics accessible to everyone.</p>
+                            <div class="profile-socials">
+                                <a href="#" aria-label="Ines Kibe on LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" aria-label="Ines Kibe on Twitter"><i class="fab fa-twitter"></i></a>
+                                <a href="mailto:ines@clearview.news" aria-label="Email Ines Kibe"><i class="fas fa-envelope"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-timeline">
+                    <h3>Our Journey</h3>
+                    <ul class="timeline">
+                        <li><strong>2023</strong> - ClearView News was founded with the mission to provide unbiased reporting.</li>
+                        <li><strong>2024</strong> - Launched our multimedia platform, bringing video and audio content to our readers.</li>
+                        <li><strong>Today</strong> - Continuing to grow our community and innovate in the digital news space.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mission-quote">
+                <h3>Our Mission</h3>
+                <blockquote>
+                    "To cut through the noise and deliver news that is not only accurate but also insightful. We started ClearView to empower readers with the clarity they deserve in a complex world."
+                    <cite>&mdash; Tjay Earl & Ines Kibe, Co-Founders</cite>
+                </blockquote>
             </div>
         </section>
 
@@ -233,7 +283,13 @@
 
             <div class="multimedia-category">
                 <h3><i class="fas fa-podcast"></i> Podcasts</h3>
-                <div class="multimedia-grid" id="multimedia-podcasts"></div>
+                <div id="audio-player-container" class="hidden">
+                    <p>Now Playing: <span id="now-playing-title"></span></p>
+                    <audio id="main-audio-player" controls></audio>
+                </div>
+                <div class="playlist" id="multimedia-podcasts">
+                    <!-- Podcast playlist will be rendered here by JS -->
+                </div>
             </div>
         </section>
 
@@ -332,6 +388,15 @@
             <p class="copyright">&copy; <span id="copyright-year"></span> ClearView News. All Rights Reserved.</p>
         </div>
     </footer>
+
+    <!-- Lightbox for Image Galleries -->
+    <div id="lightbox-overlay" class="hidden">
+        <span id="lightbox-close">&times;</span>
+        <div class="lightbox-content">
+            <img id="lightbox-image" src="" alt="Lightbox image">
+            <div id="lightbox-caption"></div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 

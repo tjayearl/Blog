@@ -176,7 +176,7 @@ function displayMultimedia() {
     podcastsContainer.innerHTML = '';
 
     if (multimediaItems.length === 0) {
-        videosContainer.innerHTML = '<p class="empty-message">No videos have been added yet.</p>';
+        // If you want a general message, you could add it here, but per-section is better.
         return;
     }
 
@@ -187,24 +187,34 @@ function displayMultimedia() {
 
         const adminDeleteBtn = isAdminLoggedIn ? `<button class="delete-btn" data-id="${item._id}">Delete</button>` : '';
 
-        let cardContent = `
-            ${adminDeleteBtn}
-            <div class="multimedia-thumbnail">
-                <a href="${escapeHTML(item.contentUrl)}" target="_blank" rel="noopener noreferrer">
-                    <img src="${escapeHTML(item.thumbnailUrl)}" alt="${escapeHTML(item.title)}" loading="lazy">
-                    ${item.type === 'video' ? '<div class="play-icon"><i class="fas fa-play"></i></div>' : ''}
-                </a>
-            </div>
-            <h4>${escapeHTML(item.title)}</h4>
-            <p>${escapeHTML(item.description)}</p>
-        `;
-
-        if (item.type === 'podcast') {
-            card.classList.add('podcast-card');
-            cardContent += `<a href="${escapeHTML(item.contentUrl)}" target="_blank" rel="noopener noreferrer" class="listen-btn"><i class="fas fa-headphones-alt"></i> Listen Now</a>`;
+        if (item.type === 'video') {
+            card.innerHTML = `
+                ${adminDeleteBtn}
+                <div class="multimedia-thumbnail" data-content-url="${escapeHTML(item.contentUrl)}">
+                    <video class="video-player" poster="${escapeHTML(item.thumbnailUrl)}" preload="metadata">
+                        <source src="${escapeHTML(item.contentUrl)}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="play-icon"><i class="fas fa-play"></i></div>
+                </div>
+                <h4>${escapeHTML(item.title)}</h4>
+                <p>${escapeHTML(item.description)}</p>
+            `;
+        } else if (item.type === 'gallery') {
+             card.innerHTML = `
+                ${adminDeleteBtn}
+                <div class="multimedia-thumbnail gallery-item">
+                     <a href="${escapeHTML(item.contentUrl)}" data-title="${escapeHTML(item.title)}">
+                        <img src="${escapeHTML(item.thumbnailUrl)}" alt="${escapeHTML(item.title)}" loading="lazy">
+                    </a>
+                </div>
+                <h4>${escapeHTML(item.title)}</h4>
+                <p>${escapeHTML(item.description)}</p>
+            `;
+        } else if (item.type === 'podcast') {
+            card.className = 'playlist-item'; // Use playlist-item class instead of multimedia-card
+            card.innerHTML = `<button class="play-track-btn" data-src="${escapeHTML(item.contentUrl)}" data-title="${escapeHTML(item.title)}"><i class="fas fa-play"></i></button> <span class="track-title">${escapeHTML(item.title)}</span> ${adminDeleteBtn}`;
         }
-
-        card.innerHTML = cardContent;
 
         if (item.type === 'video') videosContainer.appendChild(card);
         else if (item.type === 'gallery') galleriesContainer.appendChild(card);
@@ -1169,6 +1179,61 @@ document.body.addEventListener('click', function(e) {
             addComment(index);
         }
     }
+
+    // Multimedia card actions (play video)
+    const thumbnailEl = e.target.closest('.multimedia-thumbnail');
+    if (thumbnailEl && thumbnailEl.dataset.contentUrl) {
+        const card = thumbnailEl.closest('.multimedia-card');
+        const video = card.querySelector('.video-player');
+        const playIcon = card.querySelector('.play-icon');
+        if (video) {
+            video.play();
+            video.setAttribute('controls', 'true'); // Show native controls after play
+            playIcon.style.display = 'none'; // Hide custom play button
+        }
+    }
+
+    // Playlist item play button
+    if (e.target.matches('.play-track-btn')) {
+        const playerContainer = document.getElementById('audio-player-container');
+        const player = document.getElementById('main-audio-player');
+        const nowPlayingTitle = document.getElementById('now-playing-title');
+        const trackSrc = e.target.dataset.src;
+        const trackTitle = e.target.dataset.title;
+
+        // Show the player
+        playerContainer.classList.remove('hidden');
+
+        // Update player source and title, then play
+        player.src = trackSrc;
+        nowPlayingTitle.textContent = trackTitle;
+        player.play();
+
+        // Highlight the current track
+        document.querySelectorAll('.playlist-item').forEach(item => item.classList.remove('playing'));
+        e.target.closest('.playlist-item').classList.add('playing');
+    }
+
+    // Gallery item click for lightbox
+    const galleryLink = e.target.closest('.gallery-item a');
+    if (galleryLink) {
+        e.preventDefault(); // Prevent navigating to the image URL
+        const imageUrl = galleryLink.href;
+        const captionText = galleryLink.dataset.title;
+
+        const lightboxOverlay = document.getElementById('lightbox-overlay');
+        const lightboxImage = document.getElementById('lightbox-image');
+        const lightboxCaption = document.getElementById('lightbox-caption');
+
+        lightboxImage.src = imageUrl;
+        lightboxCaption.textContent = captionText;
+        lightboxOverlay.classList.remove('hidden');
+    }
+
+    // Close lightbox
+    if (e.target.id === 'lightbox-overlay' || e.target.id === 'lightbox-close') {
+        document.getElementById('lightbox-overlay').classList.add('hidden');
+    }
 });
 // Close login panel if clicking anywhere else on the page
 document.addEventListener('click', (e) => {
@@ -1268,6 +1333,26 @@ function init() {
     if (savedTheme === 'light') {
         themeToggle.checked = true;
     }
+
+    // --- Intersection Observer for fade-in animations ---
+    const observerOptions = {
+        root: null, // Use the viewport as the root
+        rootMargin: '0px',
+        threshold: 0.1 // Trigger when 10% of the item is visible
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target); // Stop observing once it's visible
+            }
+        });
+    }, observerOptions);
+
+    // Observe all elements with the .fade-in class
+    const elementsToFadeIn = document.querySelectorAll('.multimedia-card, .playlist-item');
+    elementsToFadeIn.forEach(el => observer.observe(el));
 }
 
 init();
