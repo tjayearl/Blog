@@ -62,6 +62,43 @@ body {
     color: var(--accent-green);
 }
 
+/* Divider and Support Section */
+.support-us-section {
+    margin-top: 2.5rem;
+}
+
+.divider {
+    height: 1px;
+    width: 80%;
+    background-color: var(--border-color);
+    margin: 0 auto 2.5rem auto;
+}
+
+.support-us-section h3 {
+    color: var(--accent-gold);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.support-btn {
+    display: inline-block;
+    background-color: var(--accent-gold);
+    color: var(--bg-primary);
+    padding: 12px 24px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 1rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.support-btn:hover {
+    background-color: #d1af68;
+    transform: translateY(-2px);
+}
+
+.support-btn.small { padding: 8px 16px; font-size: 0.9rem; }
+
 /* Style the new form container */
 #subscribe-form {
     display: flex;
