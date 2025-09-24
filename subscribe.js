@@ -1,11 +1,13 @@
 // --- STATE ---
-let selectedPlan = 'monthly'; // Default selected plan
+// No state needed for this simple form anymore.
 
 // --- DOM ELEMENTS ---
 const notificationContainer = document.getElementById('notification-container');
-const paymentPlansContainer = document.querySelector('.payment-plans');
-const confirmSubscribeBtn = document.getElementById('confirm-subscribe-btn');
+const subscribeForm = document.getElementById('subscribe-form');
 const emailInput = document.getElementById('subscribe-email');
+const nameInput = document.getElementById('subscribe-name');
+const subscribeContent = document.getElementById('subscribe-content');
+const thankYouMessage = document.getElementById('thank-you-message');
 
 // --- FUNCTIONS ---
 
@@ -36,23 +38,20 @@ function showNotification(message, type = 'success') {
 
 // --- EVENT LISTENERS ---
 
-paymentPlansContainer.addEventListener('click', (e) => {
-    const clickedPlan = e.target.closest('.plan-card');
-    if (!clickedPlan) return;
+subscribeForm.addEventListener('submit', (e) => {
+    e.preventDefault(); // Prevent default form submission
 
-    // Update state
-    selectedPlan = clickedPlan.dataset.plan;
+    const email = emailInput.value.trim();
+    const name = nameInput.value.trim();
 
-    // Update UI
-    const allPlanCards = paymentPlansContainer.querySelectorAll('.plan-card');
-    allPlanCards.forEach(card => card.classList.remove('selected'));
-    clickedPlan.classList.add('selected');
-});
+    if (email && emailInput.checkValidity()) {
+        // In a real app, you would send this to a server.
+        // For now, we'll just show the thank you message on the page.
+        subscribeContent.classList.add('hidden');
+        thankYouMessage.classList.remove('hidden');
 
-confirmSubscribeBtn.addEventListener('click', () => {
-    if (emailInput.value && emailInput.checkValidity()) {
-        showNotification(`Thank you for subscribing with ${emailInput.value}!`);
         emailInput.value = '';
+        nameInput.value = '';
     } else {
         showNotification('Please enter a valid email address.', 'error');
     }
@@ -60,5 +59,3 @@ confirmSubscribeBtn.addEventListener('click', () => {
 
 // --- INITIALIZATION ---
 document.getElementById('copyright-year').textContent = new Date().getFullYear();
-// Set default selected plan on init
-paymentPlansContainer.querySelector(`.plan-card[data-plan='${selectedPlan}']`).classList.add('selected');
