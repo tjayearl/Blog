@@ -45,6 +45,13 @@ subscribeForm.addEventListener('submit', (e) => {
     const name = nameInput.value.trim();
 
     if (email && emailInput.checkValidity()) {
+        // Save subscriber email to localStorage
+        let subscribers = JSON.parse(localStorage.getItem('blogSubscribers')) || [];
+        if (!subscribers.includes(email)) {
+            subscribers.push(email);
+            localStorage.setItem('blogSubscribers', JSON.stringify(subscribers));
+        }
+
         // In a real app, you would send this to a server.
         // For now, we'll just show the thank you message on the page.
         subscribeContent.classList.add('hidden');
