@@ -5,9 +5,7 @@
 const notificationContainer = document.getElementById('notification-container');
 const subscribeForm = document.getElementById('subscribe-form');
 const emailInput = document.getElementById('subscribe-email');
-const nameInput = document.getElementById('subscribe-name');
-const subscribeContent = document.getElementById('subscribe-content');
-const thankYouMessage = document.getElementById('thank-you-message');
+const subscribeBtn = document.getElementById('confirm-subscribe-btn');
 
 // --- FUNCTIONS ---
 
@@ -36,15 +34,43 @@ function showNotification(message, type = 'success') {
     }, 4000);
 }
 
+/**
+ * Displays an inline message below the form.
+ * @param {string} message - The message text.
+ * @param {string} type - 'success' or 'error'.
+ */
+function showInlineMessage(message, type) {
+    let msgEl = document.querySelector('.subscribe-message');
+    if (!msgEl) {
+        msgEl = document.createElement('div');
+        msgEl.className = 'subscribe-message';
+        subscribeForm.appendChild(msgEl);
+    }
+    
+    msgEl.textContent = message;
+    msgEl.style.color = type === 'error' ? '#e06c75' : '#28a745'; // Red or Green
+    msgEl.style.opacity = '1';
+}
+
 // --- EVENT LISTENERS ---
 
 subscribeForm.addEventListener('submit', (e) => {
     e.preventDefault(); // Prevent default form submission
 
     const email = emailInput.value.trim();
-    const name = nameInput.value.trim();
+    
+    // Simple email regex for validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (email && emailInput.checkValidity()) {
+    if (!email || !emailRegex.test(email)) {
+        showInlineMessage('❌ Please enter a valid email address.', 'error');
+        // Shake animation for input
+        emailInput.style.borderColor = '#e06c75';
+        setTimeout(() => emailInput.style.borderColor = '', 500);
+        return;
+    }
+
+    if (email) {
         // Save subscriber email to localStorage
         let subscribers = JSON.parse(localStorage.getItem('blogSubscribers')) || [];
         if (!subscribers.includes(email)) {
@@ -52,15 +78,19 @@ subscribeForm.addEventListener('submit', (e) => {
             localStorage.setItem('blogSubscribers', JSON.stringify(subscribers));
         }
 
-        // In a real app, you would send this to a server.
-        // For now, we'll just show the thank you message on the page.
-        subscribeContent.classList.add('hidden');
-        thankYouMessage.classList.remove('hidden');
-
+        // Success State
+        showInlineMessage('✅ Thanks for subscribing! You’ll receive updates soon.', 'success');
+        
+        // Update Button
+        subscribeBtn.textContent = 'Subscribed ✓';
+        subscribeBtn.disabled = true;
+        
+        // Clear Input
         emailInput.value = '';
-        nameInput.value = '';
-    } else {
-        showNotification('Please enter a valid email address.', 'error');
+        emailInput.blur();
+
+        // Optional: Reset after a delay if you want to allow another subscription
+        // setTimeout(() => { ... }, 5000);
     }
 });
 

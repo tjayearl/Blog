@@ -182,6 +182,14 @@ header {
 .logo {
   margin: 0;
   font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+}
+
+.logo-image {
+    height: 40px; /* Adjust based on your header height */
+    width: auto;
+    margin-right: 10px;
 }
 
 nav {

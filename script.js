@@ -1259,17 +1259,28 @@ contactForm.addEventListener('submit', (e) => {
 sidebarNewsletterForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const emailInput = document.getElementById('sidebar-email');
+    const submitBtn = sidebarNewsletterForm.querySelector('button');
     const email = emailInput.value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (email && emailInput.checkValidity()) {
+    if (email && emailRegex.test(email)) {
         let subscribers = JSON.parse(localStorage.getItem('blogSubscribers')) || [];
         if (!subscribers.includes(email)) {
             subscribers.push(email);
             localStorage.setItem('blogSubscribers', JSON.stringify(subscribers));
-            showNotification(`Thank you for subscribing with ${email}!`);
+            
+            // Success State
+            showNotification(`Thanks! You're subscribed.`);
             emailInput.value = '';
+            
+            if (submitBtn) {
+                submitBtn.textContent = 'Subscribed ✓';
+                submitBtn.disabled = true;
+                // Optional: Reset button after a few seconds
+                setTimeout(() => { submitBtn.textContent = 'Subscribe'; submitBtn.disabled = false; }, 5000);
+            }
         } else {
-            showNotification('This email is already subscribed.', 'error');
+            showNotification('This email is already subscribed.', 'info');
         }
     } else {
         showNotification('Please enter a valid email address.', 'error');
